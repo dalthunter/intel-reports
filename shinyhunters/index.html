@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShinyHunters — Threat Actor Profile | Dalton Hunter</title>
+<meta name="description" content="Threat intelligence assessment on ShinyHunters: OAuth/vishing-driven SaaS data theft, the 2025–2026 Salesforce campaign, MITRE ATT&CK mapping, and mitigation guidance.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a href="#overview" class="skip-link">Skip to content</a>
+
+<div class="desk">
+  <div class="folder-wrap">
+
+    <div class="folder-tab">Dalton Hunter</div>
+
+    <div class="paper">
+
+      <header class="doc-header">
+        <div class="doc-header-title">Threat Actor Profile</div>
+        <div class="doc-header-right">
+          <div class="doc-author">Dalton Hunter</div>
+          <div class="doc-date">August 2026</div>
+        </div>
+      </header>
+
+      <!-- Top nav -->
+      <nav class="topnav" aria-label="Report sections">
+        <div class="topnav-inner">
+          <a class="navlink" href="#overview">Overview</a>
+          <a class="navlink" href="#key-judgments">Key Judgments</a>
+          <a class="navlink" href="#profile">Actor Profile</a>
+          <a class="navlink" href="#timeline">Timeline</a>
+          <a class="navlink" href="#victimology">Victimology</a>
+          <a class="navlink" href="#ttps">Kill Chain / TTPs</a>
+          <a class="navlink" href="#technical">Technical</a>
+          <a class="navlink" href="#iocs">IOCs</a>
+          <a class="navlink" href="#mitigations">Mitigations</a>
+          <a class="navlink" href="#references">References</a>
+        </div>
+      </nav>
+
+      <main>
+
+        <!-- HERO / OVERVIEW -->
+        <section id="overview" class="hero">
+          <div class="hero-kicker">Threat Actor Profile — SaaS Data-Theft &amp; Extortion Collective</div>
+          <h1>ShinyHunters</h1>
+          <div class="aka">aka ShinyCorp · sp1d3rhunters · UNC6040 (access) / UNC6240 (extortion) · allied as "Scattered Lapsus$ Hunters"</div>
+          <p class="hero-thesis">
+            A financially motivated data-theft and extortion collective active since 2020, built on a
+            pay-or-leak playbook that has evolved from smash-and-grab consumer database breaches into the
+            largest sustained OAuth and vishing campaign against Salesforce environments on record —
+            run in close, documented coordination with Scattered Spider.
+          </p>
+          <div class="threat-level">Threat Level: <strong>Critical</strong></div>
+
+          <div class="stat-row">
+            <div class="stat"><div class="stat-num">2020</div><div class="stat-lbl">First observed</div></div>
+            <div class="stat"><div class="stat-num">400+</div><div class="stat-lbl">Orgs breached, all-time</div></div>
+            <div class="stat"><div class="stat-num">1,000+</div><div class="stat-lbl">Orgs hit, 2025–26 Salesforce campaign</div></div>
+            <div class="stat"><div class="stat-num">Oct '25</div><div class="stat-lbl">FBI seizes BreachForums</div></div>
+            <div class="stat"><div class="stat-num">4</div><div class="stat-lbl">France arrests, Jun 2025</div></div>
+          </div>
+        </section>
+
+        <!-- KEY JUDGMENTS -->
+        <section id="key-judgments">
+          <div class="eyebrow">Section 01</div>
+          <h2>Key Judgments</h2>
+
+          <div class="kj-list">
+            <div class="kj-item">
+              <p>ShinyHunters is not a fixed roster but a persona-led collective. A leadership figure operating as <strong>ShinyCorp</strong> (also seen as sp1d3rhunters/shinyc0rp) has directed the brand since at least 2020, took ownership of BreachForums after its founder's 2023 arrest, and publicly disavowed the forum as compromised by imposters once the FBI seized it in October 2025 — group operations continued uninterrupted regardless.</p>
+            </div>
+            <div class="kj-item">
+              <p>The group's core method has shifted from database exfiltration to <strong>identity abuse</strong>: since mid-2025 the dominant vector has been vishing victims into authorizing a fraudulent OAuth application impersonating Salesforce's "Data Loader" tool, then riding that trust relationship into downstream SaaS and cloud-warehouse data. No Salesforce vulnerability has been exploited — every documented intrusion abuses legitimate, victim-granted access.</p>
+            </div>
+            <div class="kj-item">
+              <p>ShinyHunters and Scattered Spider operate as effectively one extended collective as of 2025. FINRA, ReliaQuest, and other trusted-third-party reporting confirm shared infrastructure, overlapping Telegram administration, and joint claims of responsibility (e.g. Jaguar Land Rover), consistent with the group's own "Scattered Lapsus$ Hunters" branding.</p>
+            </div>
+            <div class="kj-item">
+              <p>The 2025–2026 Salesforce campaign is unprecedented in scale for this actor: public reporting attributes over 1,000 compromised organizations and a claimed 1.5 billion stolen records to the campaign, including an attempted extortion of Salesforce itself. Follow-on token abuse via Salesloft Drift, Gainsight, and Anodot integrations has repeatedly reopened access even after the initial vector was contained.</p>
+            </div>
+            <div class="kj-item">
+              <p>Law enforcement pressure has been real but not disruptive: Sébastien Raoult's 2022 arrest and 2024 sentencing, four additional French arrests in June 2025, and the FBI's October 2025 BreachForums seizure each produced headlines without a corresponding pause in operations — new campaigns (Anodot in April 2026, the Klue breach in June 2026) followed within weeks each time.</p>
+            </div>
+          </div>
+
+          <div class="callout analyst-note">
+            <div class="callout-label">Analyst Note</div>
+            <p>The throughline across six years of ShinyHunters activity is that the "hack" is almost always a person, not a system. Whether it's a 2020 forum credential dump or a 2026 fraudulent OAuth consent screen, the group's actual skill is convincing someone with legitimate access to hand it over. That's consistent with, and increasingly inseparable from, Scattered Spider's playbook — treat the two as one threat picture going forward.</p>
+          </div>
+        </section>
+
+        <!-- ACTOR PROFILE -->
+        <section id="profile">
+          <div class="eyebrow">Section 02</div>
+          <h2>Actor Profile</h2>
+
+          <h3>Origin &amp; structure</h3>
+          <p>ShinyHunters surfaced on dark web forums in May 2020, believed to have formed as early as 2019, and announced itself with a two-week burst of breaches against more than a dozen companies — Tokopedia (91 million records), Microsoft's private GitHub repositories, Wattpad (270 million records), Zoosk, HomeChef, and Minted among them. The group is led by a persona known as <strong>ShinyCorp</strong> (also referenced as sp1d3rhunters and shinyc0rp across Telegram), though its broader composition is fluid and contested by researchers. ShinyHunters took over administration of BreachForums after founder "Pompompurin's" 2023 arrest; when the FBI seized the forum's infrastructure in October 2025, the group leaked the forum's own 300,000-user database and publicly warned that any surviving BreachForums domains were impostors.</p>
+
+          <h3>Targeting philosophy</h3>
+          <p>Early ShinyHunters (2020–2021) was opportunistic: breach a consumer platform's database, sell or leak it. By 2024 the group had moved into supply-chain access brokering, most notably the Snowflake campaign — a compromised EPAM Systems employee endpoint yielded unencrypted Snowflake credentials stored in Jira, cascading into roughly 160 organizations including AT&T, Ticketmaster, and Santander. Since mid-2025 the group has concentrated on the Salesforce ecosystem specifically: vishing-driven OAuth consent abuse, followed by token theft from trusted third-party integrations (Salesloft Drift, Gainsight, Anodot) that grants access to every downstream customer of those platforms in one move — a force multiplier well beyond what direct breaches alone would achieve.</p>
+
+          <h3>Extortion model</h3>
+          <p>ShinyHunters runs a straightforward pay-or-leak model: private ransom demand first, public auction or leak on forums, Telegram, or a branded leak site if refused, with proof samples historically hosted via Limewire and communicated over email or Tox. Pressure tactics extend to DDoS attacks, harassment of personnel, and public deadline threats — the March 2026 Experience Cloud campaign, for instance, threatened mass data release beginning March 14, 2026 unless victims engaged. Reporting from DoControl also notes signs of a nascent "product roadmap" resembling ransomware-as-a-service, suggesting further convergence with traditional RaaS economics.</p>
+
+          <div class="callout analyst-note">
+            <div class="callout-label">Analyst Note</div>
+            <p>Watch the EPAM/Snowflake pattern as a template, not a one-off: ShinyHunters has shown a repeated preference for compromising one well-placed SaaS or integration vendor and then working outward to every downstream customer, rather than attacking targets one at a time. Salesloft Drift, Gainsight, and Anodot are three separate instances of the exact same move in under a year.</p>
+          </div>
+        </section>
+
+        <!-- TIMELINE -->
+        <section id="timeline">
+          <div class="eyebrow">Section 03</div>
+          <h2>Timeline of Activity</h2>
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-date">May 2020</div>
+              <h4>Public debut</h4>
+              <p>A rapid burst of breaches announces the group: Tokopedia (91M records), Microsoft GitHub repositories, Wattpad (270M records), and several smaller consumer platforms within two weeks.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">May 2022 / Jan 2024</div>
+              <h4>Raoult arrest &amp; sentencing</h4>
+              <p>French national Sébastien Raoult ("Sezyo Kaizen") is arrested in Morocco, extradited to the US, and sentenced in January 2024 to three years and over $5M in restitution — the group's most significant legal setback to date.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">2024</div>
+              <h4>Snowflake supply-chain campaign</h4>
+              <p>A compromised EPAM Systems endpoint exposes unencrypted Snowflake credentials in Jira, cascading into roughly 160 organizations including AT&T (110M records), Ticketmaster (560M records), and Santander (30M records).</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Jun 2025</div>
+              <h4>Salesforce vishing campaign begins; French arrests</h4>
+              <p>Google's Threat Intelligence Group begins tracking Salesforce-focused vishing as UNC6040/UNC6240; Google's own corporate Salesforce instance is hit. The same month, French authorities arrest four individuals linked to ShinyHunters/BreachForums administration.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Aug–Sep 2025</div>
+              <h4>Drift token theft &amp; JLR breach</h4>
+              <p>Stolen Salesloft Drift OAuth tokens expose roughly 760 downstream Salesforce customers. In September, Jaguar Land Rover's production shutdown is jointly claimed by ShinyHunters and Scattered Spider; the Instructure/Canvas breach (275M individuals) is also traced to this period.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Oct–Nov 2025</div>
+              <h4>BreachForums seized; Gainsight token abuse</h4>
+              <p>The FBI seizes BreachForums infrastructure; ShinyHunters leaks the forum's own user data and disavows remaining domains. In November, stolen Gainsight OAuth tokens expose 200+ additional Salesforce instances.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Dec 2025</div>
+              <h4>Coinbase extortion attempt</h4>
+              <p>An insider-enabled breach at Coinbase leads to a $20M ransom demand; Coinbase refuses and offers a matching $20M reward for information. A former Coinbase employee is arrested the same month.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Mar–Apr 2026</div>
+              <h4>Experience Cloud campaign &amp; Anodot breach</h4>
+              <p>Automated scanning (the "AuraInspector" tooling) drives a mass extortion campaign against misconfigured Salesforce Experience Cloud portals. In April, a breach of analytics vendor Anodot yields stolen tokens reaching Google BigQuery and Snowflake data for downstream customers including Rockstar Games and Zara.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Jun–Jul 2026</div>
+              <h4>Klue breach &amp; year-long campaign mapped</h4>
+              <p>A disused legacy credential at competitive-intelligence platform Klue is exploited to harvest OAuth tokens reaching customers including Huntress and Recorded Future. In July, Microsoft publishes research formally mapping the mid-2025-to-mid-2026 Salesforce campaign to three distinct OAuth-abuse techniques.</p>
+            </div>
+          </div>
+
+          <div class="callout analyst-note">
+            <div class="callout-label">Analyst Note</div>
+            <p>Notice how little dead time there is between "law enforcement action" and "next major breach" in this timeline. The June 2025 arrests, the October 2025 forum seizure, and the December 2025 Coinbase arrest all sit within weeks of a new named victim. Plan detection and response around the assumption that arrests slow individuals, not the brand.</p>
+          </div>
+        </section>
+
+        <!-- VICTIMOLOGY -->
+        <section id="victimology">
+          <div class="eyebrow">Section 04</div>
+          <h2>Victimology</h2>
+          <p>ShinyHunters doesn't run a single leak site with a stable victim count, so the figures below are pulled directly from disclosed incident numbers rather than aggregate percentages. Treat them as documented scale, not a full census — the group's own claims (e.g. "1.5 billion records") should be read with the same caution any threat-actor self-reporting deserves.</p>
+
+          <div class="two-col">
+            <div class="vic-block">
+              <h3 class="vic-block-title">2025–2026 Salesforce campaign, by entry point <span>organizations affected, per public reporting</span></h3>
+              <div class="bar-group">
+                <div class="bar-row"><div class="bar-name">Full OAuth/vishing campaign</div><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><div class="bar-pct">1,000+</div></div>
+                <div class="bar-row"><div class="bar-name">Salesloft Drift token theft</div><div class="bar-track"><div class="bar-fill" style="width:76%"></div></div><div class="bar-pct">760</div></div>
+                <div class="bar-row"><div class="bar-name">Gainsight token theft</div><div class="bar-track"><div class="bar-fill" style="width:20%"></div></div><div class="bar-pct">200+</div></div>
+              </div>
+            </div>
+            <div class="vic-block">
+              <h3 class="vic-block-title">Largest disclosed breaches <span>records/individuals affected, flagship incidents</span></h3>
+              <div class="bar-group">
+                <div class="bar-row"><div class="bar-name">Ticketmaster (2024)</div><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><div class="bar-pct">560M</div></div>
+                <div class="bar-row"><div class="bar-name">Instructure/Canvas (2025)</div><div class="bar-track"><div class="bar-fill" style="width:49%"></div></div><div class="bar-pct">275M</div></div>
+                <div class="bar-row"><div class="bar-name">Wattpad (2020)</div><div class="bar-track"><div class="bar-fill" style="width:48%"></div></div><div class="bar-pct">270M</div></div>
+                <div class="bar-row"><div class="bar-name">AT&amp;T (2024)</div><div class="bar-track"><div class="bar-fill" style="width:20%"></div></div><div class="bar-pct">110M</div></div>
+                <div class="bar-row"><div class="bar-name">Tokopedia (2020)</div><div class="bar-track"><div class="bar-fill" style="width:16%"></div></div><div class="bar-pct">91M</div></div>
+              </div>
+            </div>
+          </div>
+
+          <p style="margin-top:16px;">Named 2025–2026 victims span luxury retail (Chanel, Pandora, Adidas, several LVMH brands), aviation (Qantas, Air France–KLM), financial services (Allianz Life, Coinbase), automotive (Jaguar Land Rover), education (PowerSchool, Instructure/Canvas), and technology (Google, Cisco, Rockstar Games, Vimeo, Zara, Grafana, Huntress, Recorded Future) — reflecting the campaign's SaaS-integration-driven spread rather than any single-sector focus.</p>
+
+          <div class="callout analyst-note">
+            <div class="callout-label">Analyst Note</div>
+            <p>The entry-point breakdown is the more useful chart of the two for prioritization. A single vendor integration compromise (Drift, Gainsight, Anodot) repeatedly produces hundreds of downstream victims in one move — that's the pattern worth building third-party risk monitoring around, more than any individual sector's exposure.</p>
+          </div>
+        </section>
+
+        <!-- TTPs / KILL CHAIN -->
+        <section id="ttps">
+          <div class="eyebrow">Section 05</div>
+          <h2>Kill Chain &amp; MITRE ATT&amp;CK Mapping</h2>
+          <p>ShinyHunters' current kill chain barely touches malware. The group operates almost entirely inside legitimate SaaS trust relationships — OAuth grants, API access, and integration tokens — which makes this a harder chain to signature and a more useful one to map behaviorally.</p>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">01</span><h3>Initial Access</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1598.004</span><span class="ttp-name">Spearphishing Voice</span></div>
+              <p>Operators call employees impersonating IT support and walk them through authorizing a fraudulent OAuth application — most notably a spoofed "Data Loader" impersonating Salesforce's own tool — via the legitimate device-authorization consent flow.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1199</span><span class="ttp-name">Trusted Relationship</span></div>
+              <p>Rather than attacking targets directly, the group repeatedly compromises a shared SaaS integration vendor (Salesloft Drift, Gainsight, Anodot) and inherits legitimate access to every one of that vendor's downstream customers.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">02</span><h3>Execution &amp; Persistence</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1550.001</span><span class="ttp-name">Use Alternate Authentication Material: Application Access Token</span></div>
+              <p>Stolen OAuth refresh tokens are reused directly against Salesforce, Google BigQuery, and Snowflake APIs, persisting access well past the original point of compromise without needing further credential theft.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1556</span><span class="ttp-name">Modify Authentication Process</span></div>
+              <p>In January 2026 campaigns tracked as UNC6661/UNC6671, operators were observed deleting MFA-enrollment notifications in some Okta-linked environments, suppressing the victim's own visibility into a new device being registered.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">03</span><h3>Discovery &amp; Defense Evasion</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1595</span><span class="ttp-name">Active Scanning</span></div>
+              <p>Automated tooling (reported under the name "AuraInspector") scans the internet for misconfigured, publicly exposed Salesforce Experience Cloud portals at scale, converting isolated configuration mistakes into a systemic exposure list.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1078.004</span><span class="ttp-name">Valid Accounts: Cloud Accounts</span></div>
+              <p>Because access rides on legitimate OAuth grants and valid API tokens rather than exploited vulnerabilities, activity blends into normal SaaS administrative and integration traffic almost by default.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">04</span><h3>Collection</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1213</span><span class="ttp-name">Data from Information Repositories</span></div>
+              <p>Bulk API pulls against Salesforce objects, SharePoint, OneDrive, and connected Gong/BigQuery/Snowflake data stores extract customer records, business contacts, and internal documentation directly through sanctioned application interfaces.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">05</span><h3>Exfiltration</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1567</span><span class="ttp-name">Exfiltration Over Web Service</span></div>
+              <p>Data moves out directly over the same legitimate APIs used to access it — no separate malware-based exfiltration channel is typically required, since the stolen token already grants a sanctioned data path.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">06</span><h3>Impact</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1657</span><span class="ttp-name">Financial Theft / Extortion</span></div>
+              <p>Standard pay-or-leak pressure follows: private ransom demand, then public deadline threats, DDoS, harassment, and leak-site or Telegram publication if payment is refused — most visibly in the March 2026 Experience Cloud campaign's public leak deadline.</p>
+            </div>
+          </div>
+
+          <div class="callout analyst-note">
+            <div class="callout-label">Analyst Note</div>
+            <p>There's effectively no "malware phase" in this kill chain — from initial access through exfiltration, everything rides on legitimate OAuth tokens and sanctioned API calls. That means EDR and AV coverage contribute almost nothing here. Detection has to live in SaaS-layer telemetry: OAuth grant monitoring, anomalous Bulk API volume, and third-party integration audits.</p>
+          </div>
+        </section>
+
+        <!-- TECHNICAL DEEP DIVE -->
+        <section id="technical">
+          <div class="eyebrow">Section 06</div>
+          <h2>Technical Deep Dive</h2>
+
+          <h3>Primary attack surface</h3>
+          <p>Unlike a traditional ransomware or exploit-driven actor, ShinyHunters' 2025–2026 campaign has no headline CVE — the group's leverage comes from OAuth trust design, not a software flaw. Two adjacent, real vulnerabilities have intersected with the group's activity and are worth tracking separately: a flaw in Instructure Canvas's Free-For-Teacher account program (exploited in the group's May 2026 return to the Instructure breach), and the TanStack npm supply-chain compromise, which yielded a GitHub token later used against Grafana. Neither is a Salesforce vulnerability; both illustrate the same underlying pattern of riding a trusted third-party weakness into a much larger blast radius.</p>
+
+          <h3>Tooling &amp; named artifacts observed</h3>
+          <div class="tool-grid">
+            <span class="tool-tag">Fraudulent "Data Loader" OAuth app <span class="fn">— vishing-delivered, spoofs Salesforce's own tool</span></span>
+            <span class="tool-tag">AuraInspector <span class="fn">— automated Experience Cloud misconfiguration scanner</span></span>
+            <span class="tool-tag">Stolen Drift / Gainsight / Anodot OAuth tokens <span class="fn">— third-party integration abuse</span></span>
+            <span class="tool-tag">Device code phishing <span class="fn">— core delivery method for the fraudulent app grant</span></span>
+            <span class="tool-tag">Telegram ("Sim Land" channel) <span class="fn">— coordination with SIM-swap ecosystem</span></span>
+            <span class="tool-tag">Tox / email / Limewire-hosted samples <span class="fn">— extortion communication &amp; proof</span></span>
+            <span class="tool-tag">BreachForums (legacy) <span class="fn">— data sale/leak platform, seized Oct 2025</span></span>
+          </div>
+
+          <h3>A note on the Scattered Spider relationship</h3>
+          <p>Multiple trusted sources — FINRA, ReliaQuest, and Microsoft among them — now treat ShinyHunters and Scattered Spider as closely intertwined rather than merely "linked." ReliaQuest identified overlapping typosquatted Salesforce phishing domain patterns between the two brands, and ShinyCorp's own August 2025 move into administering the "Sim Land" Telegram channel points to direct coordination with SIM-swapping infrastructure historically associated with Scattered Spider's earliest campaigns. For defenders, the practical implication is that mitigations effective against one collective's help-desk and identity-abuse tradecraft are very likely to transfer to the other.</p>
+
+          <div class="callout analyst-note">
+            <div class="callout-label">Analyst Note</div>
+            <p>I've kept the CVE table short deliberately — there's almost nothing to patch here. If your org has any Salesforce, Drift, Gainsight, or similar SaaS integration footprint, the actionable technical surface is OAuth app governance and API monitoring, not a vulnerability scan.</p>
+          </div>
+        </section>
+
+        <!-- IOCs -->
+        <section id="iocs">
+          <div class="eyebrow">Section 07</div>
+          <h2>Indicators of Compromise</h2>
+          <p>ShinyHunters' current campaign leaves almost no malware artifacts to hash — the intrusion path is a phone call and an OAuth consent screen. What follows are the durable, publicly reported patterns and named artifacts, which hold detection value far longer than any single domain or token would.</p>
+
+          <h3>Reported artifacts &amp; infrastructure patterns</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Indicator</th><th>Type</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">"Data Loader" (fraudulent)</td><td>OAuth app name</td><td>Spoofs Salesforce's legitimate Data Loader tool; requests broad API scopes including full data access and refresh-token generation</td></tr>
+                <tr><td class="mono">*-my-salesforce[.]com</td><td>Domain pattern (defanged)</td><td>Typosquat naming convention identified by ReliaQuest across 2025 phishing infrastructure</td></tr>
+                <tr><td class="mono">keyword-salesforce[.]com</td><td>Domain pattern (defanged)</td><td>Second identified naming convention, often incorporating the target company's name</td></tr>
+                <tr><td class="mono">ShinyCorp / sp1d3rhunters / shinyc0rp</td><td>Actor persona/handle</td><td>Publicly self-identified leadership aliases across Telegram and forum activity</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Detection-relevant behavior</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Behavior</th><th>Type</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">New OAuth grant, broad scope</td><td>Behavior</td><td>Especially apps requesting full API access + refresh tokens shortly after a help-desk interaction</td></tr>
+                <tr><td class="mono">Anomalous Bulk API volume</td><td>Behavior</td><td>Large, atypical data pulls from Salesforce objects outside normal integration patterns</td></tr>
+                <tr><td class="mono">MFA-enrollment notification suppression</td><td>Behavior</td><td>Missing or deleted new-device enrollment alerts in Okta-linked environments</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout analyst-note">
+            <div class="callout-label">Analyst Note</div>
+            <p>I haven't included fabricated file hashes here, deliberately — this actor's current campaign is functionally malware-free, and inventing sample hashes for a real, active group would misrepresent the intelligence rather than help you detect it. The OAuth-grant and Bulk-API behaviors above are the actual, durable signal.</p>
+          </div>
+        </section>
+
+        <!-- MITIGATIONS -->
+        <section id="mitigations">
+          <div class="eyebrow">Section 08</div>
+          <h2>Detection &amp; Mitigation Priorities</h2>
+          <p>Ordered by estimated impact-to-effort ratio for a mid-sized enterprise defending against this actor's observed playbook.</p>
+          <ul class="mit-list">
+            <li><span class="pri">P1</span><span><strong>Require admin approval for new Connected App / OAuth grants in Salesforce</strong> and verify any "Data Loader"-named integration is the genuine Salesforce-published app. This directly closes the group's dominant 2025–2026 access vector.</span></li>
+            <li><span class="pri">P1</span><span><strong>Harden help-desk identity verification</strong> against vishing, matching the same call-back/attestation controls warranted against Scattered Spider — the two groups share this exact technique.</span></li>
+            <li><span class="pri">P1</span><span><strong>Enable Salesforce Shield / Real-Time Event Monitoring</strong> to catch anomalous Bulk API activity and API-token usage patterns that Salesforce's standard audit logs miss.</span></li>
+            <li><span class="pri">P2</span><span><strong>Inventory and regularly rotate tokens for every third-party SaaS integration</strong> (Drift, Gainsight, Anodot, and similar), and deprovision disused legacy integrations — the Klue breach began with exactly this kind of forgotten credential.</span></li>
+            <li><span class="pri">P2</span><span><strong>Alert on suppressed or missing MFA-enrollment notifications</strong>, particularly in Okta-linked environments, as an indicator of the group's device-registration evasion technique.</span></li>
+            <li><span class="pri">P2</span><span><strong>Audit public-facing Salesforce Experience Cloud portals</strong> for guest-access misconfigurations before automated scanning tools like the group's reported "AuraInspector" find them first.</span></li>
+            <li><span class="pri">P3</span><span><strong>Monitor for domain registrations impersonating your Salesforce/SSO branding</strong>, particularly the "-my-salesforce" and "keyword-salesforce" naming patterns identified in public reporting.</span></li>
+            <li><span class="pri">P3</span><span><strong>Prepare an extortion response playbook</strong> (legal, comms, and law enforcement contacts) in advance, given the group's consistent use of public deadline threats and harassment pressure.</span></li>
+          </ul>
+
+          <div class="callout analyst-note">
+            <div class="callout-label">Analyst Note</div>
+            <p>If you can only act on three items here: lock down OAuth app approval in Salesforce, harden help-desk verification, and inventory your third-party SaaS integration tokens. Every named 2025–2026 breach in this report traces back to one of those three gaps.</p>
+          </div>
+        </section>
+
+        <!-- REFERENCES -->
+        <section id="references">
+          <div class="eyebrow">Section 09</div>
+          <h2>References</h2>
+          <ul class="source-list">
+            <li><span class="idx">01</span><a href="https://www.huntress.com/threat-library/threat-actors/shinyhunters" target="_blank" rel="noopener">ShinyHunters Threat Actor Profile: TTPs, IoCs &amp; Attacks</a><span class="pub">Huntress</span></li>
+            <li><span class="idx">02</span><a href="https://labs.cloudsecurityalliance.org/research/csa-research-note-shinyhunters-oauth-saas-abuse-20260716-csa/" target="_blank" rel="noopener">ShinyHunters' OAuth Pivot: A Year of SaaS Supply-Chain Breaches</a><span class="pub">Cloud Security Alliance</span></li>
+            <li><span class="idx">03</span><a href="https://thehackernews.com/2026/07/microsoft-maps-year-long-shinyhunters.html" target="_blank" rel="noopener">Microsoft Maps Three Salesforce Attack Paths Tied to a Year of ShinyHunters Activity</a><span class="pub">The Hacker News</span></li>
+            <li><span class="idx">04</span><a href="https://www.microsoft.com/en-us/security/blog/2026/07/13/defending-saas-based-applications-against-shinyhunters-oauth-abuse/" target="_blank" rel="noopener">Defending SaaS-Based Applications Against ShinyHunters OAuth Abuse</a><span class="pub">Microsoft Security</span></li>
+            <li><span class="idx">05</span><a href="https://reliaquest.com/blog/threat-spotlight-shinyhunters-data-breach-targets-salesforce-amid-scattered-spider-collaboration/" target="_blank" rel="noopener">ShinyHunters Targets Salesforce Amid Clues of Scattered Spider Collaboration</a><span class="pub">ReliaQuest</span></li>
+            <li><span class="idx">06</span><a href="https://blog.eclecticiq.com/shinyhunters-calling-financially-motivated-data-extortion-group-targeting-enterprise-cloud-applications" target="_blank" rel="noopener">ShinyHunters Calling: Financially Motivated Data Extortion Group</a><span class="pub">EclecticIQ</span></li>
+            <li><span class="idx">07</span><a href="https://pushsecurity.com/blog/analyzing-the-instructure-breach" target="_blank" rel="noopener">How Three Techniques Are Behind ShinyHunters' 2026 Campaigns</a><span class="pub">Push Security</span></li>
+            <li><span class="idx">08</span><a href="https://blackkite.com/blog/shinyhunters-and-the-salesforce-experience-cloud-campaign-how-misconfigured-portals-create-supply-chain-risk" target="_blank" rel="noopener">ShinyHunters and the Salesforce Experience Cloud Campaign</a><span class="pub">Black Kite</span></li>
+            <li><span class="idx">09</span><a href="https://sendmarc.com/dmarc/shinyhunters/" target="_blank" rel="noopener">ShinyHunters: The Group Behind 300+ Breaches</a><span class="pub">Sendmarc</span></li>
+            <li><span class="idx">10</span><a href="https://www.finra.org/rules-guidance/guidance/cybersecurity-alert-salesforce-experience-cloud-security-incident" target="_blank" rel="noopener">Cybersecurity Alert — Salesforce Experience Cloud Security Incident</a><span class="pub">FINRA</span></li>
+            <li><span class="idx">11</span><a href="https://www.docontrol.io/blog/shinyhunters" target="_blank" rel="noopener">Who Is ShinyHunters? Tactics, Top Attacks &amp; How to Protect Your Organization</a><span class="pub">DoControl</span></li>
+          </ul>
+        </section>
+
+      </main>
+
+      <footer>
+        <p class="fnote">Independent analysis synthesized from the public reporting cited above. Not affiliated with, endorsed by, or reviewed by any vendor cited.</p>
+        <div class="footer-meta">
+          <span class="footer-name">Dalton Hunter</span>
+          <div class="footer-social">
+            <a href="https://www.linkedin.com/in/dalton-hunter/" id="footer-linkedin" class="footer-social-link" aria-label="LinkedIn" target="_blank" rel="noopener">
+              <span class="footer-social-label">LinkedIn</span>
+              <svg class="footer-social-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </a>
+            <a href="https://github.com/dalthunter" id="footer-github" class="footer-social-link" aria-label="GitHub" target="_blank" rel="noopener">
+              <span class="footer-social-label">GitHub</span>
+              <svg class="footer-social-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.084-.729.084-.729 1.205.084 1.838 1.237 1.838 1.237 1.07 1.834 2.809 1.304 3.495.997.108-.775.42-1.305.763-1.605-2.665-.305-5.466-1.334-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+            </a>
+          </div>
+        </div>
+      </footer>
+
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
