@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scattered Spider: Threat Actor Profile | Dalton Hunter</title>
+<meta name="description" content="Threat intelligence assessment on Scattered Spider: help-desk social engineering, DragonForce ransomware, MITRE ATT&CK mapping, and mitigation guidance.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a href="#overview" class="skip-link">Skip to content</a>
+
+<div class="desk">
+  <div class="folder-wrap">
+
+    <div class="folder-tab">Dalton Hunter</div>
+
+    <div class="paper">
+
+      <header class="doc-header">
+        <div class="doc-header-title">Threat Actor Profile</div>
+        <div class="doc-header-right">
+          <div class="doc-author">Dalton Hunter</div>
+          <div class="doc-date">August 2026</div>
+        </div>
+      </header>
+
+      <!-- Top nav -->
+      <nav class="topnav" aria-label="Report sections">
+        <div class="topnav-inner">
+          <a class="navlink" href="#overview">Overview</a>
+          <a class="navlink" href="#profile">Actor Profile</a>
+          <a class="navlink" href="#timeline">Timeline</a>
+          <a class="navlink" href="#ttps">Kill Chain / TTPs</a>
+          <a class="navlink" href="#iocs">IOCs</a>
+          <a class="navlink" href="#mitigations">Mitigations</a>
+          <a class="navlink" href="#references">References</a>
+        </div>
+      </nav>
+
+      <main>
+
+        <!-- HERO / OVERVIEW -->
+        <section id="overview" class="hero">
+          <div class="hero-kicker">Threat Actor Profile: Identity-Centric Cybercrime Collective</div>
+          <h1>Scattered Spider</h1>
+          <div class="aka">aka UNC3944 · Octo Tempest · Muddled Libra · allied as "Scattered Lapsus$ Hunters"</div>
+          <p class="hero-thesis">
+            A loosely affiliated, largely English-speaking cybercrime collective operating out of "The Com"
+            since 2022, known for bypassing MFA entirely by social-engineering help desks over the phone.
+            Since 2025 it has paired that tradecraft with DragonForce ransomware for double extortion.
+          </p>
+          <div class="threat-level">Threat Level: <strong>Critical</strong></div>
+
+          <div class="stat-row">
+            <div class="stat"><div class="stat-num">2022</div><div class="stat-lbl">First observed</div></div>
+            <div class="stat"><div class="stat-num">£270–440M</div><div class="stat-lbl">Est. cost, Apr 2025 UK retail wave</div></div>
+            <div class="stat"><div class="stat-num">6+</div><div class="stat-lbl">Vendor aliases, one collective</div></div>
+            <div class="stat"><div class="stat-num">Jul '25</div><div class="stat-lbl">Latest joint gov't advisory</div></div>
+            <div class="stat"><div class="stat-num">4</div><div class="stat-lbl">UK arrests, Jul 2025</div></div>
+          </div>
+        </section>
+
+        <!-- ACTOR PROFILE -->
+        <section id="profile">
+          <div class="eyebrow">Section 01</div>
+          <h2>Actor Profile</h2>
+
+          <h3>Origin &amp; structure</h3>
+          <p>Scattered Spider emerged from "The Com," a decentralized online community skewing young, mostly teenagers and young adults across the US, UK, and other English-speaking countries. It first drew attention in mid-2022 running SIM-swap campaigns against telecom and BPO firms, including a breach of roughly 125 Twilio customers. The same operators are tracked under several vendor names: CrowdStrike's Scattered Spider, Mandiant's UNC3944, and Microsoft's Octo Tempest among them.</p>
+
+          <h3>Targeting philosophy</h3>
+          <p>The group works in sector-focused waves, concentrating on one industry for weeks before rotating: telecom/BPO (2022), gaming and hospitality (2023, including MGM and Caesars), financial services (late 2023), then a 2025 run through UK/US retail, insurance, aviation, and automotive. ReliaQuest's analysis of 600+ linked domains found about 70% of targets fall in technology, finance, and retail trade, with 81% of phishing domains impersonating a tech vendor or SSO provider.</p>
+
+          <h3>Extortion model</h3>
+          <p>Early campaigns favored pure data-theft extortion with no encryption. The group has since worked as an affiliate of ALPHV/BlackCat and RansomHub, and since early 2025 has partnered with the DragonForce ransomware cartel for double extortion. Its 2025 "Scattered Lapsus$ Hunters" branding with ShinyHunters and Lapsus$ points to a further shift toward large-scale SaaS data extortion.</p>
+        </section>
+
+        <!-- TIMELINE -->
+        <section id="timeline">
+          <div class="eyebrow">Section 02</div>
+          <h2>Timeline of Activity</h2>
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-date">Jun 2022</div>
+              <h4>First tracked activity</h4>
+              <p>CrowdStrike tracks SIM-swap campaigns against telecom and BPO firms, including a breach of roughly 125 Twilio customers.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Sep 2023</div>
+              <h4>MGM Resorts &amp; Caesars breaches</h4>
+              <p>A help-desk vishing call gets the group into MGM; both MGM and Caesars are hit within weeks, alongside ALPHV/BlackCat ransomware.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">2024</div>
+              <h4>Pivot into SaaS and cloud</h4>
+              <p>Mandiant documents direct targeting of vCenter, CyberArk, Salesforce, Azure, AWS, and GCP via stolen SSO credentials.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Apr–May 2025</div>
+              <h4>UK retail wave</h4>
+              <p>Vishing hits Marks &amp; Spencer, then Co-op and Harrods; M&amp;S loses NTDS.dit hashes and confirms DragonForce ransomware.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Jun–Jul 2025</div>
+              <h4>Insurance and aviation waves</h4>
+              <p>Targeting rotates to US insurers, then airlines including Hawaiian Airlines, WestJet, and Qantas.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Jul 2025</div>
+              <h4>Joint advisory update &amp; UK arrests</h4>
+              <p>CISA and international partners update their joint advisory; the UK's NCA arrests four individuals tied to the retail wave.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Sep 2025</div>
+              <h4>Jaguar Land Rover &amp; "Scattered Lapsus$ Hunters"</h4>
+              <p>JLR halts production after a breach jointly claimed with ShinyHunters; the groups begin branding together publicly.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">May 2026</div>
+              <h4>Ransomware activity resumes against insurers</h4>
+              <p>CrowdStrike documents the group returning to aggressive ransomware operations against insurers after a pause.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- TTPs / KILL CHAIN -->
+        <section id="ttps">
+          <div class="eyebrow">Section 03</div>
+          <h2>Kill Chain &amp; MITRE ATT&amp;CK Mapping</h2>
+          <p>Scattered Spider's kill chain depends little on malware. The group's edge is convincing a person to hand over access, then living off legitimate remote-access tools once inside. Its technical footprint stays thin by design, though two real vulnerabilities have intersected with its campaigns: a critical SAP NetWeaver flaw (CVE-2025-31324) tied to the Jaguar Land Rover breach, and a VMware ESXi authentication-bypass technique (CVE-2024-37085) used to pivot stolen domain access into virtualization management.</p>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">01</span><h3>Initial Access</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Phishing for Information &amp; Impersonation</span></div>
+              <p>Operators call IT help desks directly, impersonating a locked-out employee. They routinely answer identity-verification questions correctly, pointing to pre-call research on the target.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">MFA Request Generation</span></div>
+              <p>Push-bombing pressures both victims and help-desk staff into approving a fraudulent MFA device during a live call.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Valid Accounts</span></div>
+              <p>SIM-swapping intercepts SMS-based MFA and reset codes, alongside typosquatted SSO and VPN phishing kits.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">02</span><h3>Execution &amp; Persistence</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Remote Access Software</span></div>
+              <p>Commercial RMM tools like AnyDesk, ScreenConnect, and TeamViewer establish persistence that looks like ordinary IT tooling.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Modify Authentication Process</span></div>
+              <p>New MFA devices are registered under compromised identities, surviving a routine password reset.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">03</span><h3>Privilege Escalation &amp; Evasion</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Impair Defenses (BYOVD)</span></div>
+              <p>A signed but vulnerable driver (POORTRY), delivered via a loader (STONESTOP), kills EDR and AV at the kernel level.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Valid Cloud Accounts</span></div>
+              <p>Once inside identity infrastructure, the group pivots directly into SaaS and cloud consoles, including vCenter, Salesforce, Azure, and AWS.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">04</span><h3>Credential Access &amp; Lateral Movement</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">DCSync &amp; Credential Dumping</span></div>
+              <p>Mimikatz and Impacket's secretsdump extract and replicate domain credentials once a privileged foothold is established.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">AD Discovery &amp; Lateral Movement</span></div>
+              <p>SharpHound and BloodHound map attack paths toward Domain Admin, then RDP and SSH move the operator laterally.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">05</span><h3>Command &amp; Control / Exfiltration</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Protocol Tunneling</span></div>
+              <p>Ngrok and Tailscale proxy C2 traffic through infrastructure that looks like ordinary developer tooling.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Exfiltration to Cloud Storage</span></div>
+              <p>Data is staged to MEGA or attacker-controlled S3 buckets ahead of any ransomware deployment.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">06</span><h3>Impact</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Inhibit System Recovery</span></div>
+              <p>Backup infrastructure and virtualization management are targeted and shut down ahead of encryption to remove recovery options.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Data Encrypted for Impact</span></div>
+              <p>DragonForce ransomware, cross-platform across Windows, Linux, and ESXi, follows the exfiltration stage.</p>
+            </div>
+          </div>
+
+          <h3>Tooling &amp; named artifacts</h3>
+          <div class="tool-grid">
+            <span class="tool-tag">Mimikatz</span>
+            <span class="tool-tag">Impacket / secretsdump</span>
+            <span class="tool-tag">SharpHound / BloodHound</span>
+            <span class="tool-tag">AnyDesk / ScreenConnect / TeamViewer</span>
+            <span class="tool-tag">Ngrok / Tailscale</span>
+            <span class="tool-tag">POORTRY / STONESTOP</span>
+            <span class="tool-tag">DragonForce ransomware</span>
+            <span class="tool-tag">MEGA / Amazon S3</span>
+          </div>
+        </section>
+
+        <!-- IOCs -->
+        <section id="iocs">
+          <div class="eyebrow">Section 04</div>
+          <h2>Indicators of Compromise</h2>
+          <p>Scattered Spider's phishing infrastructure and tooling turn over fast, with individual pages taken down within 30 minutes of registration. What follows are durable, publicly reported patterns rather than a point-in-time list.</p>
+
+          <h3>Reported patterns &amp; behavior</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Indicator / Behavior</th><th>Type</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">POORTRY</td><td>Signed malicious driver</td><td>Delivered via the STONESTOP loader to kill EDR/AV at kernel level</td></tr>
+                <tr><td class="mono">Typosquat SSO/helpdesk domains</td><td>Domain pattern</td><td>~81% of tracked phishing domains impersonate a tech vendor</td></tr>
+                <tr><td class="mono">NTDS.dit exfiltration</td><td>Behavior</td><td>Domain password-hash theft confirmed in the M&amp;S incident</td></tr>
+                <tr><td class="mono">New MFA device after reset</td><td>Behavior</td><td>New authenticator registered right after a help-desk reset call</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- MITIGATIONS -->
+        <section id="mitigations">
+          <div class="eyebrow">Section 05</div>
+          <h2>Detection &amp; Mitigation Priorities</h2>
+          <p>Ordered by impact-to-effort ratio for a mid-sized enterprise.</p>
+          <ul class="mit-list">
+            <li><span class="pri">P1</span><span><strong>Harden help-desk identity verification</strong> with call-back or manager attestation before any password reset or MFA re-enrollment.</span></li>
+            <li><span class="pri">P1</span><span><strong>Deploy phishing-resistant MFA</strong> (FIDO2/WebAuthn) on all SSO, VPN, and privileged accounts.</span></li>
+            <li><span class="pri">P1</span><span><strong>Alert on new MFA device enrollment</strong> immediately following a help-desk password reset.</span></li>
+            <li><span class="pri">P2</span><span><strong>Restrict and monitor RMM tool usage</strong> via allow-listing rather than treating it as trusted by default.</span></li>
+            <li><span class="pri">P2</span><span><strong>Move backup and virtualization management off the domain</strong>, behind dedicated, non-domain credentials.</span></li>
+            <li><span class="pri">P3</span><span><strong>Baseline and alert on DCSync-style requests</strong> and BloodHound-style AD enumeration from non-admin hosts.</span></li>
+          </ul>
+        </section>
+
+        <!-- REFERENCES -->
+        <section id="references">
+          <div class="eyebrow">Section 06</div>
+          <h2>References</h2>
+          <ul class="source-list">
+            <li><span class="idx">01</span><a href="https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-320a" target="_blank" rel="noopener">Scattered Spider: Joint Cybersecurity Advisory AA23-320A (updated Jul 2025)</a><span class="pub">CISA / FBI / NCSC-UK / ACSC / RCMP</span></li>
+            <li><span class="idx">02</span><a href="https://attack.mitre.org/groups/G1015/" target="_blank" rel="noopener">Scattered Spider, UNC3944, Octo Tempest: Group G1015</a><span class="pub">MITRE ATT&amp;CK</span></li>
+            <li><span class="idx">03</span><a href="https://www.group-ib.com/masked-actors/scatteredspider/" target="_blank" rel="noopener">Scattered Spider: TTPs, MGM Attack &amp; Defenses</a><span class="pub">Group-IB</span></li>
+            <li><span class="idx">04</span><a href="https://www.crowdstrike.com/en-us/press-releases/crowdstrike-2026-financial-services-threat-landscape-report/" target="_blank" rel="noopener">CrowdStrike 2026 Financial Services Threat Landscape Report</a><span class="pub">CrowdStrike</span></li>
+            <li><span class="idx">05</span><a href="https://thehackernews.com/2025/07/four-arrested-in-440m-cyber-attack-on.html" target="_blank" rel="noopener">Four Arrested in £440M Cyber Attack on Marks &amp; Spencer, Co-op, and Harrods</a><span class="pub">The Hacker News</span></li>
+            <li><span class="idx">06</span><a href="https://www.acronis.com/en/tru/posts/the-dragonforce-cartel-scattered-spider-at-the-gate/" target="_blank" rel="noopener">The DragonForce Cartel: Scattered Spider at the Gate</a><span class="pub">Acronis</span></li>
+            <li><span class="idx">07</span><a href="https://reliaquest.com/blog/scattered-spider-cyber-attacks-using-phishing-social-engineering-2025/" target="_blank" rel="noopener">Scattered Spider Targets Tech Companies for Help-Desk Exploitation</a><span class="pub">ReliaQuest</span></li>
+          </ul>
+        </section>
+
+      </main>
+
+      <footer>
+        <p class="fnote">Independent analysis synthesized from the public reporting cited above. Not affiliated with, endorsed by, or reviewed by any vendor cited.</p>
+        <div class="footer-meta">
+          <span class="footer-name">Dalton Hunter</span>
+          <div class="footer-social">
+            <a href="https://www.linkedin.com/in/dalton-hunter/" id="footer-linkedin" class="footer-social-link" aria-label="LinkedIn" target="_blank" rel="noopener">
+              <span class="footer-social-label">LinkedIn</span>
+              <svg class="footer-social-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </a>
+            <a href="https://github.com/dalthunter" id="footer-github" class="footer-social-link" aria-label="GitHub" target="_blank" rel="noopener">
+              <span class="footer-social-label">GitHub</span>
+              <svg class="footer-social-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.084-.729.084-.729 1.205.084 1.838 1.237 1.838 1.237 1.07 1.834 2.809 1.304 3.495.997.108-.775.42-1.305.763-1.605-2.665-.305-5.466-1.334-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+            </a>
+          </div>
+        </div>
+      </footer>
+
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
