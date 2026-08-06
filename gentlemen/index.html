@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Gentlemen — Threat Actor Profile | Dalton Hunter</title>
+<meta name="description" content="Threat intelligence assessment on The Gentlemen ransomware group: TTPs, MITRE ATT&CK mapping, CVEs, IOCs, and mitigation guidance.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a href="#overview" class="skip-link">Skip to content</a>
+
+<div class="desk">
+  <div class="folder-wrap">
+
+    <div class="folder-tab">Dalton Hunter</div>
+
+    <div class="paper">
+
+      <header class="doc-header">
+        <div class="doc-header-title">Threat Actor Profile</div>
+        <div class="doc-header-right">
+          <div class="doc-author">Dalton Hunter</div>
+          <div class="doc-date">August 2026</div>
+        </div>
+      </header>
+
+      <!-- Top nav -->
+      <nav class="topnav" aria-label="Report sections">
+        <div class="topnav-inner">
+          <a class="navlink" href="#overview">Overview</a>
+          <a class="navlink" href="#key-judgments">Key Judgments</a>
+          <a class="navlink" href="#profile">Actor Profile</a>
+          <a class="navlink" href="#timeline">Timeline</a>
+          <a class="navlink" href="#ttps">Kill Chain / TTPs</a>
+          <a class="navlink" href="#iocs">IOCs</a>
+          <a class="navlink" href="#mitigations">Mitigations</a>
+          <a class="navlink" href="#references">References</a>
+        </div>
+      </nav>
+
+      <main>
+
+        <!-- HERO / OVERVIEW -->
+        <section id="overview" class="hero">
+          <div class="hero-kicker">Threat Actor Profile — Ransomware-as-a-Service</div>
+          <h1>The Gentlemen</h1>
+          <div class="aka">aka Hastalamuerte · formerly ArmCorp</div>
+          <p class="hero-thesis">
+            A ransomware-as-a-service operation that split from a Qilin affiliate program in July 2025
+            over a payment dispute, and within a year became the most active ransomware brand tracked
+            on leak sites, driven by mass exploitation of a Fortinet authentication-bypass flaw and an
+            unusually patient, research-first targeting model.
+          </p>
+          <div class="threat-level">Threat Level: <strong>High</strong></div>
+
+          <div class="stat-row">
+            <div class="stat"><div class="stat-num">300</div><div class="stat-lbl">Q2 2026 victims posted</div></div>
+            <div class="stat"><div class="stat-num">#1</div><div class="stat-lbl">Ransomware brand, Q2 2026</div></div>
+            <div class="stat"><div class="stat-num">17+</div><div class="stat-lbl">MITRE ATT&CK techniques</div></div>
+            <div class="stat"><div class="stat-num">Jul '25</div><div class="stat-lbl">First observed</div></div>
+            <div class="stat"><div class="stat-num">~20</div><div class="stat-lbl">Est. core members</div></div>
+          </div>
+        </section>
+
+        <!-- KEY JUDGMENTS -->
+        <section id="key-judgments">
+          <div class="eyebrow">Section 01</div>
+          <h2>Key Judgments</h2>
+
+          <div class="kj-list">
+            <div class="kj-item">
+              <p>The Gentlemen's core operators previously ran under the Qilin affiliate program as <strong>ArmCorp</strong>, and split off after a public $48,000 payment dispute in July 2025. The group's own admin, <em>hastalamuerte</em>, effectively admitted the ransomware was already in development before the split was announced.</p>
+            </div>
+            <div class="kj-item">
+              <p>Initial access is dominated by exploitation of <strong>CVE-2024-55591</strong>, a FortiOS/FortiProxy authentication-bypass chain, combined with brute-forcing of weak or default FortiGate VPN credentials. This is a volume play against internet-facing edge devices, not bespoke intrusion tradecraft.</p>
+            </div>
+            <div class="kj-item">
+              <p>The group is likely to keep expanding its exploit portfolio beyond Fortinet. Affiliate discussions reference SonicWall, Cisco ASA, and Oracle E-Business Suite as near-term targets, mirroring the mass-exploitation playbook used by Cl0p in 2025.</p>
+            </div>
+            <div class="kj-item">
+              <p>The group's operational security is inconsistent with its technical capability: the administrator has repeatedly exposed identifying details in public forum disputes, and a May 2026 breach of internal infrastructure leaked roughly 16 GB of operational data, including negotiation transcripts and toolchain details.</p>
+            </div>
+            <div class="kj-item">
+              <p>Deployment of ransomware to encryption is likely to remain fast once achieved. The group uses NETLOGON-share propagation and WMI-based self-spreading to reach domain-joined hosts near-simultaneously, so dwell-time detection matters more than post-detonation response.</p>
+            </div>
+          </div>
+
+          <div class="callout analyst-note">
+            <div class="callout-label">Analyst Note</div>
+            <p>These five judgments really tell one story: a technically unremarkable actor that wins through volume and consistency, not innovation. That's useful for prioritization. You get more value out of patching one Fortinet CVE and enforcing MFA than you do chasing exotic TTPs this group doesn't actually use.</p>
+          </div>
+        </section>
+
+        <!-- ACTOR PROFILE -->
+        <section id="profile">
+          <div class="eyebrow">Section 02</div>
+          <h2>Actor Profile</h2>
+
+          <h3>Origin &amp; structure</h3>
+          <p>The Gentlemen is a ransomware-as-a-service (RaaS) operation of roughly 20 core members, administered by a Russian-speaking operator known as <em>hastalamuerte</em>. Before branding as "The Gentlemen," the operation ran internally under the name <strong>ArmCorp</strong> as an active affiliate of the Qilin RaaS program. A Windows ransomware sample bearing The Gentlemen's own data-leak-site URL was uploaded to VirusTotal on <strong>17 July 2025</strong>, five days before hastalamuerte publicly accused Qilin of mishandling a $48,000 affiliate payment on the RAMP underground forum. The timing indicates the independent operation was already built before the dispute became the public justification for leaving.</p>
+
+          <h3>Targeting philosophy</h3>
+          <p>Unlike smash-and-grab RaaS crews that rely on volume, The Gentlemen's affiliates are instructed to prioritize targets by revenue potential, likelihood of paying (driven by sector regulation and legal exposure), and ease of privilege escalation. Devices with LDAP-integrated VPN accounts and a large user base are preferred because domain administrator compromise is faster. Reported sectors include manufacturing (~26% of confirmed victims), technology (~21%), healthcare (~19%), and financial services and construction/insurance (~17% each), with confirmed victims spanning at least 17 countries and only about 13% concentrated in the United States — reflecting opportunistic targeting of exposed FortiGate devices rather than a sector-specific campaign.</p>
+
+          <h3>Extortion model</h3>
+          <p>The group runs standard double extortion: files are encrypted with a Golang-based, cross-platform payload (Windows, Linux, ESXi, NAS, BSD variants observed), while data is exfiltrated beforehand and held over the victim's head on a Tor-hosted leak site. Leaked internal negotiation data shows opening demands around $250,000 with typical settlements closer to $190,000.</p>
+
+          <div class="callout analyst-note">
+            <div class="callout-label">Analyst Note</div>
+            <p>The ArmCorp-to-Gentlemen rebrand is a good reminder that ransomware "groups" are often just the same people under a new name. Tracking individuals and infrastructure holds up better over time than tracking brands, since brands come and go but the operators tend to stick around.</p>
+          </div>
+        </section>
+
+        <!-- TIMELINE -->
+        <section id="timeline">
+          <div class="eyebrow">Section 03</div>
+          <h2>Timeline of Activity</h2>
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-date">17 Jul 2025</div>
+              <h4>First ransomware sample surfaces</h4>
+              <p>A Windows sample already containing The Gentlemen's leak-site URL is uploaded to VirusTotal, predating the public split from Qilin.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">22 Jul 2025</div>
+              <h4>Public break from Qilin</h4>
+              <p>Hastalamuerte opens an arbitration dispute on the RAMP forum accusing Qilin of withholding an affiliate payment, publicly signaling the departure.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Sep–Oct 2025</div>
+              <h4>Leak site goes public</h4>
+              <p>The data-leak site becomes broadly known, with the group publishing roughly 48 victims across its first two months of public activity.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Nov 2025</div>
+              <h4>Attribution evidence surfaces</h4>
+              <p>Cybereason links a hardcoded string in the ransomware binary to a prior forum post by hastalamuerte discussing anti-ransomware bypass techniques, direct forensic evidence of authorship.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Q1 2026</div>
+              <h4>Explosive growth</h4>
+              <p>Victim postings surge roughly 588% quarter-over-quarter, placing the group second only to Qilin in overall volume.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">4 May 2026</div>
+              <h4>Internal infrastructure leaked</h4>
+              <p>An anonymous actor breaches The Gentlemen's backend "Rocket" database, leaking roughly 16 GB of internal data: operator identities, a 1,570-victim affiliate botnet list, negotiation transcripts, and tooling.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Q2 2026</div>
+              <h4>Becomes the most active ransomware brand</h4>
+              <p>The group posts 300 victims for the quarter, narrowly overtaking Qilin (289) to become the most active ransomware operation tracked on leak sites.</p>
+            </div>
+          </div>
+
+          <div class="callout analyst-note">
+            <div class="callout-label">Analyst Note</div>
+            <p>Laid out like this, the pattern is pretty clear: a quiet build-up, a public split, a slow burn through late 2025, then a huge jump once the FortiGate access lists matured in early 2026. Growth tracks exploit inventory almost exactly, which is a useful signal for forecasting where they go next.</p>
+          </div>
+        </section>
+
+        <!-- TTPs / KILL CHAIN -->
+        <section id="ttps">
+          <div class="eyebrow">Section 04</div>
+          <h2>Kill Chain &amp; MITRE ATT&amp;CK Mapping</h2>
+          <p>The Gentlemen's affiliates are not known for novel tradecraft. The group uses well-documented techniques competently and repeatably rather than inventing new ones. That makes the kill chain useful for detection engineering: these are things a mature SOC can build alerting for today.</p>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">01</span><h3>Initial Access</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1190</span><span class="ttp-name">Exploit Public-Facing Application</span></div>
+              <p>Mass exploitation of <strong>CVE-2024-55591</strong> (FortiOS/FortiProxy authentication bypass) against internet-exposed FortiGate management interfaces, chaining an unauthenticated WebSocket connection with a parameter-abuse and race-condition flaw to reach super-admin access without any valid credential. The group maintains a running inventory of roughly 14,700 pre-compromised FortiGate devices shared with affiliates.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1110.001</span><span class="ttp-name">Brute Force: Password Guessing</span></div>
+              <p>A separate, sizeable list of brute-forced FortiGate VPN credentials (~1,000 devices) is maintained alongside the exploited-device inventory, targeting default and weak username/password combinations on SSL-VPN portals.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">02</span><h3>Execution &amp; Persistence</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1059.001 / .006</span><span class="ttp-name">PowerShell &amp; Python scripting</span></div>
+              <p>PowerShell is used to enable Windows PowerShell Web Access, disable Defender protections, and manipulate Active Directory objects. A custom Python utility parses exported Fortinet config files to harvest credentials and feeds them directly into NetExec for SMB credential-stuffing.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1136.002</span><span class="ttp-name">Create Account: Domain Account</span></div>
+              <p>Creation of disguised admin accounts (naming patterns mimicking IT support, e.g. "MicrosoftSupporte") added to Domain Admins and granted database ownership on Veeam backup infrastructure specifically, a deliberate move to compromise the backup layer, not just the domain.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1053</span><span class="ttp-name">Scheduled Task/Job</span></div>
+              <p>Scheduled tasks launch a hidden, policy-bypassing PowerShell process at system startup with SYSTEM privileges to run an exfiltration script, ensuring data theft survives reboots.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">03</span><h3>Privilege Escalation &amp; Defense Evasion</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1484.001</span><span class="ttp-name">Group Policy Modification</span></div>
+              <p>GPOs are edited domain-wide to enable SMB, open firewall rules for file sharing, and reposition AD computer objects to force policy application across the environment.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1562.001</span><span class="ttp-name">Impair Defenses</span></div>
+              <p>Windows Defender is disabled via both Group Policy and direct PowerShell preference changes; kernel-level EDR/AV termination is achieved through <strong>Bring-Your-Own-Vulnerable-Driver (BYOVD)</strong>, loading legitimately signed but flawed drivers (<code>ThrottleBlood.sys</code>, <code>viragt64.sys</code>) to kill security processes from a trust level most agents can't touch.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1036</span><span class="ttp-name">Masquerading</span></div>
+              <p>The exfiltration tool Rclone is renamed to mimic legitimate AV software (e.g. <code>avastrclone.exe</code>) to blend into process-monitoring baselines.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1070.001</span><span class="ttp-name">Indicator Removal: Clear Windows Event Logs</span></div>
+              <p>Security, Application, and System event logs, RDP logs, Defender support files, and Prefetch data are systematically wiped post-intrusion to blunt forensic reconstruction.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">04</span><h3>Credential Access &amp; Lateral Movement</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1003.004 / T1555</span><span class="ttp-name">Credential dumping &amp; password stores</span></div>
+              <p>DPAPI backup keys are extracted via Impacket to unlock stored credentials; Veeam Backup &amp; Replication credentials are specifically targeted, including exploitation of <strong>CVE-2023-27532</strong> to pull stored connection secrets straight out of the backup product itself.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1557.001</span><span class="ttp-name">Adversary-in-the-Middle</span></div>
+              <p>NetExec's coercion modules force authentication from domain machines (Petitpotam-style) and relay the captured NTLM credentials to escalate access.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1021.001 / .002</span><span class="ttp-name">Remote Services: RDP &amp; SMB</span></div>
+              <p>Lateral movement relies on standard admin-share (SMB) and RDP abuse once domain credentials are obtained. Nothing exotic here, which is precisely why baseline SMB/RDP anomaly detection is effective.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">05</span><h3>Command &amp; Control / Exfiltration</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1572</span><span class="ttp-name">Protocol Tunneling</span></div>
+              <p>Chisel is used to tunnel a SOCKS proxy over port 443, giving C2 traffic the appearance of ordinary HTTPS and letting affiliates reach the internal network via proxychains.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1048</span><span class="ttp-name">Exfiltration Over Alternative Protocol</span></div>
+              <p>Rclone (masqueraded, see above) pushes data out over SFTP to actor-controlled infrastructure prior to encryption, underpinning the double-extortion threat.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">06</span><h3>Impact</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1490</span><span class="ttp-name">Inhibit System Recovery</span></div>
+              <p>A broad service- and process-kill list specifically targets backup software (Veeam, Acronis, BackupExec), databases, and virtualization management processes before encryption. Shadow copies are deleted via <code>vssadmin</code> and WMIC as a final step to remove local recovery options.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-id">T1486</span><span class="ttp-name">Data Encrypted for Impact</span></div>
+              <p>Golang-based encryptor (Windows/Linux/ESXi/BSD/NAS variants) drops a <code>README-GENTLEMEN.txt</code> ransom note and appends a rotating custom extension (observed: <code>.7mtzhh</code>, <code>.ojuopo</code>). The binary is password-gated at execution and self-deletes via a cleanup batch script after running, limiting sample recovery for defenders.</p>
+            </div>
+          </div>
+
+          <h3>Exploited &amp; referenced CVEs</h3>
+          <div class="table-wrap">
+            <table class="cve-table">
+              <thead><tr><th>CVE</th><th>Product</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">CVE-2024-55591</td><td>Fortinet FortiOS / FortiProxy</td><td>Authentication bypass via Node.js websocket module, chained to reach super-admin without valid credentials.</td></tr>
+                <tr><td class="mono">CVE-2023-27532</td><td>Veeam Backup &amp; Replication</td><td>Exposed credential extraction from the backup service's stored connection secrets.</td></tr>
+                <tr><td class="mono">CVE-2025-32463</td><td>Sudo (Linux, &lt;1.9.17p1)</td><td>Local privilege escalation to root.</td></tr>
+                <tr><td class="mono">CVE-2024-37085</td><td>VMware ESXi (AD integration)</td><td>Auth bypass allowing full ESXi host takeover via AD group membership abuse ("ESX Admins" group).</td></tr>
+                <tr><td class="mono">BadSuccessor</td><td>Windows Server 2025 (dMSA)</td><td>Privilege escalation technique enabling compromise of arbitrary AD users via delegated managed service accounts.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Tooling observed</h3>
+          <div class="tool-grid">
+            <span class="tool-tag">NetExec (nxc) <span class="fn">— post-exploitation framework</span></span>
+            <span class="tool-tag">Rclone <span class="fn">— exfiltration, masqueraded as AV binary</span></span>
+            <span class="tool-tag">Impacket (dpapi.py) <span class="fn">— credential extraction</span></span>
+            <span class="tool-tag">Chisel <span class="fn">— C2 tunneling</span></span>
+            <span class="tool-tag">DonPAPI <span class="fn">— mass DPAPI secret extraction</span></span>
+            <span class="tool-tag">SoftPerfect Network Scanner <span class="fn">— cracked, recon</span></span>
+            <span class="tool-tag">AntSword <span class="fn">— webshell</span></span>
+            <span class="tool-tag">MeshCentral / AnyDesk <span class="fn">— discussed for persistence/C2</span></span>
+            <span class="tool-tag">VCENTER.ps1 <span class="fn">— custom, disables HA/DRS, powers off VMs</span></span>
+            <span class="tool-tag">GLOCKER <span class="fn">— custom ransomware builder</span></span>
+            <span class="tool-tag">BYOVD drivers <span class="fn">— ThrottleBlood.sys, viragt64.sys</span></span>
+            <span class="tool-tag">Shodan / ZoomEye <span class="fn">— exposed-device enumeration</span></span>
+          </div>
+
+          <p>Open-source reporting also indicates the group's administrator has referenced using commercial AI assistants (including ChatGPT and Gemini) during ransomware development, and has discussed local, less-restricted models as fallbacks when commercial tools decline requests — worth tracking across the ransomware ecosystem broadly, since it lowers the skill floor for less technical affiliates.</p>
+
+          <div class="callout analyst-note">
+            <div class="callout-label">Analyst Note</div>
+            <p>Nothing in this kill chain requires custom malware or a novel technique, which is genuinely good news for defenders. The CVE list is short on purpose: four of the five entries are public, patched vulnerabilities, so a disciplined patch management program on edge devices removes most of this group's leverage before they ever get a foothold.</p>
+          </div>
+        </section>
+
+        <!-- IOCs -->
+        <section id="iocs">
+          <div class="eyebrow">Section 05</div>
+          <h2>Indicators of Compromise</h2>
+          <p>File hashes and infrastructure indicators below are provided for detection-engineering and hunting purposes (SIEM/EDR ingestion). Defang network indicators before storing in ticketing systems per your org's handling standard.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Indicator</th><th>Type</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td class="hash">51b9f246d6da85631131fcd1fabf0a67937d4bdde33625a44f7ee6a3a7baebd2</td><td>SHA-256</td><td>First Windows Gentlemen sample (17 Jul 2025)</td></tr>
+                <tr><td class="hash">3ab9575225e00a83a4ac2b534da5a710bdcf6eb72884944c437b5fbe5c5c9235</td><td>SHA-256</td><td>Windows sample w/ hardcoded attribution string</td></tr>
+                <tr><td class="hash">2834114ff7e487c4ca3f50ca39f7d652dea1be98f885c388f01b6ff35309307b</td><td>SHA-256</td><td>ChromeKB3.exe — Chrome credential extraction tool</td></tr>
+                <tr><td class="hash">d65c293efb5e6d033c83b2ac472bf0cb</td><td>MD5</td><td>Cracked SoftPerfect Network Scanner</td></tr>
+                <tr><td class="hash">42c062d6299ca9f76554441a29429404</td><td>MD5</td><td>VCENTER.ps1 — custom ESXi/vCenter disruption script</td></tr>
+                <tr><td class="hash">efd5366eb7473d6f7fb97ec7ac59f09d</td><td>MD5</td><td>Custom Go-based keylogger (unconfirmed operational use)</td></tr>
+                <tr><td class="mono">194[.]87[.]31[.]69</td><td>IPv4 (defanged)</td><td>Rclone SFTP exfiltration endpoint</td></tr>
+                <tr><td class="mono">README-GENTLEMEN.txt</td><td>Filename</td><td>Ransom note dropped post-encryption</td></tr>
+                <tr><td class="mono">.7mtzhh / .ojuopo</td><td>File extension</td><td>Encrypted file suffix (rotates per campaign)</td></tr>
+                <tr><td class="mono">ThrottleBlood.sys / viragt64.sys</td><td>Driver filename</td><td>BYOVD kernel-level EDR killers</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout analyst-note">
+            <div class="callout-label">Analyst Note</div>
+            <p>These indicators have a short shelf life, since the group rotates file extensions and infrastructure per campaign. I'd treat the driver names and masquerading patterns, like Rclone posing as antivirus software, as more durable detection value than any single hash or IP in this list.</p>
+          </div>
+        </section>
+
+        <!-- MITIGATIONS -->
+        <section id="mitigations">
+          <div class="eyebrow">Section 06</div>
+          <h2>Detection &amp; Mitigation Priorities</h2>
+          <p>Ordered by estimated impact-to-effort ratio for a mid-sized enterprise defending against this actor's observed playbook.</p>
+          <ul class="mit-list">
+            <li><span class="pri">P1</span><span><strong>Patch FortiOS/FortiProxy for CVE-2024-55591 immediately</strong> and audit for existing backdoor accounts (e.g. unfamiliar local admins) if patching was delayed. This single CVE is the group's dominant initial-access vector.</span></li>
+            <li><span class="pri">P1</span><span><strong>Enforce MFA on all SSL-VPN and remote-access portals.</strong> Brute-force against weak/default Fortinet credentials is a primary fallback initial-access path when exploitation isn't available.</span></li>
+            <li><span class="pri">P1</span><span><strong>Move backup infrastructure off the domain</strong> and behind a dedicated management VLAN with rotated, non-domain credentials. Veeam is a named, specific target for both credential theft and service disruption.</span></li>
+            <li><span class="pri">P2</span><span><strong>Enable driver-load monitoring / WDAC or HVCI</strong> to catch BYOVD attempts before EDR gets killed at the kernel level. Signature-based AV alone won't catch this.</span></li>
+            <li><span class="pri">P2</span><span><strong>Alert on mass service-stop / process-kill command patterns</strong> targeting backup and database services (Veeam, Acronis, SQL, Oracle) as a pre-encryption impact indicator, not just on the encryptor itself.</span></li>
+            <li><span class="pri">P2</span><span><strong>Baseline and alert on NETLOGON share writes</strong> and unusual WMI-based process spawning across many hosts in a short window. This is the group's domain-wide propagation mechanism.</span></li>
+            <li><span class="pri">P3</span><span><strong>Hunt for renamed legitimate tools</strong> (e.g. Rclone masquerading as AV binaries) via binary/hash mismatch detection rather than filename allow-listing alone.</span></li>
+            <li><span class="pri">P3</span><span><strong>Centralize and protect event log forwarding</strong> so that <code>wevtutil cl</code>-style log clearing doesn't erase the only copy of forensic evidence.</span></li>
+          </ul>
+
+          <div class="callout analyst-note">
+            <div class="callout-label">Analyst Note</div>
+            <p>If you can only act on three items here, patch the Fortinet CVE, turn on MFA everywhere, and get backup infrastructure off the domain. Everything else meaningfully reduces risk, but those three close off the paths this group actually uses to get in and finish the job.</p>
+          </div>
+        </section>
+
+        <!-- REFERENCES -->
+        <section id="references">
+          <div class="eyebrow">Section 07</div>
+          <h2>References</h2>
+          <ul class="source-list">
+            <li><span class="idx">01</span><a href="https://www.group-ib.com/blog/hastalamuerte-gentlemen-raas-ttps/" target="_blank" rel="noopener">Hasta la vista, Hastalamuerte: An Overview of The Gentlemen's TTPs</a><span class="pub">Group-IB</span></li>
+            <li><span class="idx">02</span><a href="https://www.trendmicro.com/en_us/research/25/i/unmasking-the-gentlemen-ransomware.html" target="_blank" rel="noopener">Unmasking The Gentlemen Ransomware: TTPs Revealed</a><span class="pub">Trend Micro</span></li>
+            <li><span class="idx">03</span><a href="https://www.cybereason.com/blog/the-gentlemen-ransomware" target="_blank" rel="noopener">License to Encrypt: "The Gentlemen" Make Their Move</a><span class="pub">Cybereason</span></li>
+            <li><span class="idx">04</span><a href="https://www.huntress.com/blog/the-gentlemen-ransomware-defense-evasion-ttps" target="_blank" rel="noopener">The Gentleman Ransomware: Defense Evasion TTPs Uncovered</a><span class="pub">Huntress</span></li>
+            <li><span class="idx">05</span><a href="https://www.guidepointsecurity.com/blog/ransomware-insights-q2-2026/" target="_blank" rel="noopener">Ransomware Insights from Q2 2026</a><span class="pub">GuidePoint / GRIT</span></li>
+            <li><span class="idx">06</span><a href="https://www.theinsurer.com/cyber-risk/news/the-gentlemen-ransomware-group-emerges-as-most-active-threat-actor-in-q2-2026-07-24/" target="_blank" rel="noopener">The Gentlemen ransomware group emerges as most active threat actor in Q2</a><span class="pub">The Insurer</span></li>
+            <li><span class="idx">07</span><a href="https://redpiranha.net/news/the-gentlemen-ransomware-analysis" target="_blank" rel="noopener">The Gentlemen Ransomware: Threat Intelligence Analysis, TTPs &amp; Detection Guide</a><span class="pub">Red Piranha</span></li>
+            <li><span class="idx">08</span><a href="https://www.bmsp.tech/en/knowledge/the-gentlemen-ransomware-group/" target="_blank" rel="noopener">The Gentlemen Group: TTPs, IOCs and Defense Guidance</a><span class="pub">BMSP</span></li>
+            <li><span class="idx">09</span><a href="https://www.decryptiondigest.com/blog/gentlemen-ransomware-active-campaign-2026" target="_blank" rel="noopener">The Gentlemen Ransomware 2026: 332 Victims via FortiGate RaaS</a><span class="pub">Decryption Digest</span></li>
+            <li><span class="idx">10</span><a href="https://www.infosecurity-magazine.com/news/new-ransomware-weekly/" target="_blank" rel="noopener">A New Ransomware Threat Actor Emerges Every Week, Warns Report</a><span class="pub">Infosecurity Magazine</span></li>
+            <li><span class="idx">11</span><a href="https://ransomnews.online/hub/ransomnews-thegentlemen.html" target="_blank" rel="noopener">HUB @ ransomNews — The Gentlemen</a><span class="pub">ransomNews</span></li>
+          </ul>
+        </section>
+
+      </main>
+
+      <footer>
+        <p class="fnote">Independent analysis synthesized from the public reporting cited above. Not affiliated with, endorsed by, or reviewed by any vendor cited.</p>
+        <div class="footer-meta">
+          <span class="footer-name">Dalton Hunter</span>
+          <div class="footer-social">
+            <a href="https://www.linkedin.com/in/dalton-hunter/" id="footer-linkedin" class="footer-social-link" aria-label="LinkedIn" target="_blank" rel="noopener">
+              <span class="footer-social-label">LinkedIn</span>
+              <svg class="footer-social-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </a>
+            <a href="https://github.com/dalthunter" id="footer-github" class="footer-social-link" aria-label="GitHub" target="_blank" rel="noopener">
+              <span class="footer-social-label">GitHub</span>
+              <svg class="footer-social-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.084-.729.084-.729 1.205.084 1.838 1.237 1.838 1.237 1.07 1.834 2.809 1.304 3.495.997.108-.775.42-1.305.763-1.605-2.665-.305-5.466-1.334-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+            </a>
+          </div>
+        </div>
+      </footer>
+
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
