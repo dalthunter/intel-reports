@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scattered Spider: Threat Actor Profile | Dalton Hunter</title>
+<meta name="description" content="Threat intelligence assessment on Scattered Spider (UNC3944, Octo Tempest): help desk social engineering, MFA bypass, MITRE ATT&CK mapping, and mitigation guidance.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a href="#overview" class="skip-link">Skip to content</a>
+
+<div class="desk">
+  <div class="folder-wrap">
+
+    <div class="folder-tab">Dalton Hunter</div>
+
+    <div class="paper">
+
+      <header class="doc-header">
+        <div class="doc-header-title">Threat Actor Profile</div>
+        <div class="doc-header-right">
+          <div class="doc-author">Dalton Hunter</div>
+          <div class="doc-date">August 2026</div>
+        </div>
+      </header>
+
+      <!-- Top nav -->
+      <nav class="topnav" aria-label="Report sections">
+        <div class="topnav-inner">
+          <a class="navlink" href="#overview">Overview</a>
+          <a class="navlink" href="#profile">Actor Profile</a>
+          <a class="navlink" href="#timeline">Timeline</a>
+          <a class="navlink" href="#ttps">Kill Chain / TTPs</a>
+          <a class="navlink" href="#iocs">IOCs</a>
+          <a class="navlink" href="#mitigations">Mitigations</a>
+          <a class="navlink" href="#references">References</a>
+        </div>
+      </nav>
+
+      <main>
+
+        <!-- HERO / OVERVIEW -->
+        <section id="overview" class="hero">
+          <div class="hero-kicker">Threat Actor Profile: Social Engineering Driven Extortion Collective</div>
+          <h1>Scattered Spider</h1>
+          <div class="aka">aka UNC3944 · Octo Tempest · 0ktapus · Muddled Libra · Storm-0875</div>
+          <p class="hero-thesis">
+            A financially motivated cybercriminal collective, active since 2022, built from young English speaking
+            members of "The Com" who rely on social engineering rather than malware to bypass even mature security programs.
+          </p>
+          <div class="threat-level">Threat Level: <strong>Critical</strong></div>
+
+          <div class="stat-row">
+            <div class="stat"><div class="stat-num">2022</div><div class="stat-lbl">First observed</div></div>
+            <div class="stat"><div class="stat-num">100+</div><div class="stat-lbl">Network intrusions, DOJ estimate</div></div>
+            <div class="stat"><div class="stat-num">$115M+</div><div class="stat-lbl">Ransom extorted, DOJ estimate</div></div>
+            <div class="stat"><div class="stat-num">Jul 2025</div><div class="stat-lbl">UK arrests slow operations</div></div>
+            <div class="stat"><div class="stat-num">Jun 2026</div><div class="stat-lbl">Jubair, Flowers plead guilty</div></div>
+          </div>
+        </section>
+
+        <!-- ACTOR PROFILE -->
+        <section id="profile">
+          <div class="eyebrow">Section 01</div>
+          <h2>Actor Profile</h2>
+
+          <h3>Origin &amp; structure</h3>
+          <p>Scattered Spider emerged in May 2022, formed largely of native English speaking teenagers and young adults from the US, UK, and Canada, tied to a broader loose network known as <strong>"The Com."</strong> Members coordinate over Telegram and Discord rather than through a fixed hierarchy, which is part of why the group has kept operating through repeated arrests of individual members.</p>
+
+          <h3>Targeting philosophy</h3>
+          <p>Early activity in 2022 focused on telecom and business process outsourcing firms; by 2023 the group had expanded into gaming, hospitality, retail, and financial services. Activity often arrives in sector "waves," with weeks of concentrated attacks against one industry, such as retail or insurance, before the group shifts its attention elsewhere.</p>
+
+          <h3>Extortion model</h3>
+          <p>Data theft and encryption for double extortion pressure, with the group known to move between ransomware brands, including BlackCat/ALPHV, RansomHub, Qilin, and DragonForce, rather than maintaining a single encryptor of its own. Recent activity has also shifted toward encrypting VMware vSphere and ESXi hosts directly, taking every hosted virtual machine down at once.</p>
+        </section>
+
+        <!-- TIMELINE -->
+        <section id="timeline">
+          <div class="eyebrow">Section 02</div>
+          <h2>Timeline of Activity</h2>
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-date">May 2022</div>
+              <h4>Public emergence</h4>
+              <p>An initial spree of roughly 45 intrusions targets telecom and BPO firms through early 2023.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Sep 2023</div>
+              <h4>MGM Resorts &amp; Caesars breaches</h4>
+              <p>Attacks disrupt Las Vegas casino operations and cement the group's public reputation.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Nov 2024</div>
+              <h4>DOJ charges filed</h4>
+              <p>Five individuals are charged with stealing millions of dollars through phishing text credential harvesting.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Apr to Jul 2025</div>
+              <h4>UK retail campaign</h4>
+              <p>Marks &amp; Spencer, Co-op, and Harrods are hit; the UK's Cyber Monitoring Centre estimates the cost at 440 million British pounds.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Jul 2025</div>
+              <h4>UK arrests</h4>
+              <p>Four suspects tied to the retail attacks are arrested; Mandiant reports a lull in new intrusions afterward.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Late 2025</div>
+              <h4>DragonForce adoption &amp; hypervisor pivot</h4>
+              <p>The group adopts DragonForce ransomware and shifts toward direct encryption of VMware vSphere and ESXi environments.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Apr 2026</div>
+              <h4>Buchanan guilty plea</h4>
+              <p>Tyler Buchanan pleads guilty in US court to fraud and identity theft tied to at least $8 million in stolen cryptocurrency.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Jun to Jul 2026</div>
+              <h4>Jubair, Flowers plea; Stokes extradited</h4>
+              <p>Jubair and Flowers plead guilty over the 2024 Transport for London attack, and Peter Stokes is extradited from Finland to face related charges.</p>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- TTPs / KILL CHAIN -->
+        <section id="ttps">
+          <div class="eyebrow">Section 03</div>
+          <h2>Kill Chain &amp; MITRE ATT&amp;CK Mapping</h2>
+          <p>Scattered Spider's kill chain barely touches malware at the entry point. Almost every intrusion begins with a phone call or a text message rather than an exploit, which makes the group's edge human, not technical.</p>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">01</span><h3>Initial Access</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Social Engineering / Help Desk Impersonation</span></div>
+              <p>Callers impersonate employees to IT help desks, requesting a password reset or new MFA device enrollment to gain an initial foothold.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">SIM Swapping</span></div>
+              <p>Operators hijack a target's phone number through telecom social engineering to intercept SMS based MFA codes.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">02</span><h3>Execution &amp; Persistence</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Bring Your Own Vulnerable Driver</span></div>
+              <p>Signed but vulnerable drivers are installed to disable endpoint security tools at the kernel level.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Valid Accounts / Legitimate Remote Access Tools</span></div>
+              <p>Stolen credentials and already trusted tools such as AnyDesk or TeamViewer maintain access without triggering malware alerts.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">03</span><h3>Discovery &amp; Defense Evasion</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Cloud Service Discovery</span></div>
+              <p>Operators enumerate Okta, Azure AD, and AWS or GCP tenants to map identity providers and privileged accounts before moving further.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">MFA Request Generation (Push Bombing)</span></div>
+              <p>Repeated MFA push notifications wear down a target until one is approved, or a fresh registration is pushed through the compromised help desk.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">04</span><h3>Collection &amp; Exfiltration</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Data from Cloud Storage</span></div>
+              <p>SaaS platforms and cloud storage buckets are queried directly for sensitive records ahead of encryption, supporting the double extortion threat.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">05</span><h3>Impact</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Data Encrypted for Impact</span></div>
+              <p>Once inside virtualization infrastructure, ESXi hosts are encrypted directly at the hypervisor level using an affiliate ransomware brand, taking every hosted virtual machine down in a single action.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- IOCs -->
+        <section id="iocs">
+          <div class="eyebrow">Section 04</div>
+          <h2>Indicators of Compromise</h2>
+          <p>Malware samples are rarely the useful indicator here, since access begins with a phone call. What follows are the durable, publicly reported behavioral and infrastructure patterns instead.</p>
+
+          <h3>Reported patterns &amp; behavior</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Indicator / Behavior</th><th>Type</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">New MFA device, shortly after a help desk call</td><td>Behavior</td><td>A leading indicator of an in progress account takeover</td></tr>
+                <tr><td class="mono">Lookalike help desk / IT support domains</td><td>Domain pattern</td><td>Used to receive callbacks or host fake verification pages</td></tr>
+                <tr><td class="mono">Repeated MFA pushes outside normal hours</td><td>Behavior</td><td>Push bombing attempts against a single account</td></tr>
+                <tr><td class="mono">Signed vulnerable driver installation</td><td>Behavior</td><td>Precedes EDR tampering and disablement</td></tr>
+                <tr><td class="mono">Unusual Okta or Azure AD admin role grants</td><td>Behavior</td><td>Often follows a successful help desk impersonation call</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- MITIGATIONS -->
+        <section id="mitigations">
+          <div class="eyebrow">Section 05</div>
+          <h2>Detection &amp; Mitigation Priorities</h2>
+          <p>Ordered by impact-to-effort ratio for a mid-sized enterprise.</p>
+          <ul class="mit-list">
+            <li><span class="pri">P1</span><span><strong>Require callback verification through a known number</strong> before any help desk password reset or MFA re-enrollment.</span></li>
+            <li><span class="pri">P1</span><span><strong>Move to phishing resistant MFA</strong> (FIDO2 hardware keys) for privileged and help desk accessible accounts.</span></li>
+            <li><span class="pri">P1</span><span><strong>Alert on new MFA device registrations</strong> and on repeated push notifications within a short window.</span></li>
+            <li><span class="pri">P2</span><span><strong>Restrict and monitor legitimate remote access tools</strong> not already approved for the environment.</span></li>
+            <li><span class="pri">P2</span><span><strong>Segment and closely monitor administrative access</strong> to virtualization platforms such as VMware vSphere and ESXi.</span></li>
+            <li><span class="pri">P3</span><span><strong>Prepare an extortion response playbook</strong> in advance, including legal, comms, and law enforcement contacts.</span></li>
+          </ul>
+
+          <div class="callout analyst-note">
+            <div class="callout-label">Analyst Note</div>
+            <p>Scattered Spider is a loose collective of young, English speaking hackers who break in mostly by talking their way past a help desk rather than by exploiting software. They typically call or text an employee, pose as IT support, and get a password reset or a new MFA device approved, then use that access to steal data and, often, deploy ransomware. Organizations should pay attention because these methods work even against companies with strong technical defenses, since the weak point is a person on the phone, not a server. This matters because arrests have slowed the group before but never stopped it, so the same help desk gap keeps getting used by whoever picks up the playbook next.</p>
+          </div>
+        </section>
+
+        <!-- REFERENCES -->
+        <section id="references">
+          <div class="eyebrow">Section 06</div>
+          <h2>References</h2>
+          <ul class="source-list">
+            <li><span class="idx">01</span><a href="https://attack.mitre.org/groups/G1015/" target="_blank" rel="noopener">Scattered Spider, Octo Tempest, UNC3944 (Group G1015)</a><span class="pub">MITRE ATT&amp;CK</span></li>
+            <li><span class="idx">02</span><a href="https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-320a" target="_blank" rel="noopener">#StopRansomware: Scattered Spider Advisory (AA23-320A)</a><span class="pub">CISA</span></li>
+            <li><span class="idx">03</span><a href="https://www.huntress.com/threat-library/threat-actors/scattered-spider" target="_blank" rel="noopener">Scattered Spider Threat Actor Profile: TTPs, IOCs &amp; Attacks</a><span class="pub">Huntress</span></li>
+            <li><span class="idx">04</span><a href="https://www.cybersecuritydive.com/news/what-we-know-about-the-cybercrime-group-scattered-spider/756312/" target="_blank" rel="noopener">What We Know About the Cybercrime Group Scattered Spider</a><span class="pub">Cybersecurity Dive</span></li>
+            <li><span class="idx">05</span><a href="https://www.securityweek.com/two-scattered-spider-hackers-sentenced-to-jail-in-uk/" target="_blank" rel="noopener">Two Scattered Spider Hackers Sentenced to Jail in UK</a><span class="pub">SecurityWeek</span></li>
+            <li><span class="idx">06</span><a href="https://thehackernews.com/2026/07/19-year-old-scattered-spider-suspect.html" target="_blank" rel="noopener">19 Year Old Scattered Spider Suspect Extradited to Face US Charges</a><span class="pub">The Hacker News</span></li>
+            <li><span class="idx">07</span><a href="https://www.justice.gov/opa/pr/alleged-member-criminal-cyber-hacking-group-scattered-spider-arrested-finland-and-extradited" target="_blank" rel="noopener">Alleged Member of Scattered Spider Arrested in Finland and Extradited</a><span class="pub">US Department of Justice</span></li>
+          </ul>
+        </section>
+
+      </main>
+
+      <footer>
+        <p class="fnote">Independent analysis synthesized from the public reporting cited above. Not affiliated with, endorsed by, or reviewed by any vendor cited.</p>
+        <div class="footer-meta">
+          <span class="footer-name">Dalton Hunter</span>
+          <div class="footer-social">
+            <a href="https://www.linkedin.com/in/dalton-hunter/" id="footer-linkedin" class="footer-social-link" aria-label="LinkedIn" target="_blank" rel="noopener">
+              <span class="footer-social-label">LinkedIn</span>
+              <svg class="footer-social-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </a>
+            <a href="https://github.com/dalthunter" id="footer-github" class="footer-social-link" aria-label="GitHub" target="_blank" rel="noopener">
+              <span class="footer-social-label">GitHub</span>
+              <svg class="footer-social-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.084-.729.084-.729 1.205.084 1.838 1.237 1.838 1.237 1.07 1.834 2.809 1.304 3.495.997.108-.775.42-1.305.763-1.605-2.665-.305-5.466-1.334-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+            </a>
+          </div>
+        </div>
+      </footer>
+
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
