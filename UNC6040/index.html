@@ -64,7 +64,9 @@
 <!-- ANALYST NOTE -->
 <div class="callout analyst-note">
   <div class="callout-label">Analyst Note</div>
-  <p>UNC6040 gets into organizations by calling employees and tricking them into approving Salesforce Data Loader, which allows attackers to access and steal customer data. To stop them, organizations should verify unusual requests, use phishing-resistant Multi-Factor Authentication (MFA), limit application permissions, monitor Salesforce activity, and train employees to recognize social engineering.</p>
+  <p>UNC6040 typically targets organizations by using voice phishing (vishing) to trick employees into giving attackers access to cloud accounts. The attackers can impersonate IT staff or other trusted employees and convince victims to provide information or approve changes to their accounts. Once inside, they can use stolen credentials to access cloud systems, search for sensitive information, and steal data.
+
+Their activity focuses heavily on social engineering, identity, and cloud access rather than traditional malware. I would look for unexpected phone-based authentication requests, suspicious password resets, unusual MFA changes, unfamiliar cloud logins, new devices or sessions, abnormal access to cloud data, and large or unusual data downloads.</p>
 </div>
 <!-- ACTOR PROFILE -->
 <section id="profile">
