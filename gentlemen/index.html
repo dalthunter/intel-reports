@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Gentlemen: Threat Actor Profile | Dalton Hunter</title>
+<meta name="description" content="Threat intelligence assessment on The Gentlemen (Storm-2697): FortiGate exploitation, the RaaS affiliate model, MITRE ATT&CK mapping, and mitigation guidance.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a href="#overview" class="skip-link">Skip to content</a>
+
+<div class="desk">
+  <div class="folder-wrap">
+
+    <div class="folder-tab">Dalton Hunter</div>
+
+    <div class="paper">
+
+      <header class="doc-header">
+        <div class="doc-header-title">Threat Actor Profile</div>
+        <div class="doc-header-right">
+          <div class="doc-author">Dalton Hunter</div>
+          <div class="doc-date">August 2026</div>
+        </div>
+      </header>
+
+      <!-- Top nav -->
+      <nav class="topnav" aria-label="Report sections">
+        <div class="topnav-inner">
+          <a class="navlink" href="#overview">Overview</a>
+          <a class="navlink" href="#profile">Actor Profile</a>
+          <a class="navlink" href="#timeline">Timeline</a>
+          <a class="navlink" href="#ttps">Kill Chain / TTPs</a>
+          <a class="navlink" href="#iocs">IOCs</a>
+          <a class="navlink" href="#mitigations">Mitigations</a>
+          <a class="navlink" href="#references">References</a>
+        </div>
+      </nav>
+
+      <main>
+
+        <!-- HERO / OVERVIEW -->
+        <section id="overview" class="hero">
+          <div class="hero-kicker">Threat Actor Profile: Ransomware-as-a-Service Operation</div>
+          <h1>The Gentlemen</h1>
+          <div class="aka">aka Storm-2697 (Microsoft) · administrator aliases hastalamuerte / zeta88</div>
+          <div class="threat-level">Threat Level: <strong>Critical</strong></div>
+
+          <div class="stat-row">
+            <div class="stat"><div class="stat-num">2025</div><div class="stat-lbl">First observed</div></div>
+            <div class="stat"><div class="stat-num">200+</div><div class="stat-lbl">Orgs listed, leak site (early 2026)</div></div>
+            <div class="stat"><div class="stat-num">#2</div><div class="stat-lbl">Global ransomware ranking by volume, Q1 '26</div></div>
+            <div class="stat"><div class="stat-num">May '26</div><div class="stat-lbl">Internal "Rocket" database leaked</div></div>
+            <div class="stat"><div class="stat-num">90%</div><div class="stat-lbl">Max affiliate profit share offered</div></div>
+          </div>
+
+          <!-- QUICK FACTS BOX -->
+          <div class="callout quick-facts">
+            <div class="callout-label">Quick Facts</div>
+            <div class="quick-facts-grid">
+              <div class="qf-item">
+                <h4>TTPs</h4>
+                <p>Edge-device exploitation (FortiGate CVEs) and purchased/stolen credentials for initial access; PowerShell, PsExec, and WMI for discovery and lateral movement; Defender tampering and log/shadow-copy deletion for defense evasion; a Go-based encryptor pushed domain-wide via a modified GPO.</p>
+              </div>
+              <div class="qf-item">
+                <h4>IOCs</h4>
+                <p>CVE-2024-55591, CVE-2025-32433, and CVE-2025-33073; unauthorized Cloudflare Zero Trust tunnels registered inside victim environments; wiped prefetch, RDP logs, and PowerShell history; deleted shadow copies.</p>
+              </div>
+              <div class="qf-item">
+                <h4>Targeted Sectors</h4>
+                <p>Opportunistic rather than sector-specific — affiliates target organizations with revenue and cyber-insurance coverage likely to support a payout. Known victims span energy (Complexul Energetic Oltenia) and technology/software consultancies (UK-to-Turkey chain breach).</p>
+              </div>
+              <div class="qf-item">
+                <h4>Attack Patterns</h4>
+                <p>Fast-moving double extortion: data is exfiltrated before encryption, with a leak-site posting backing the ransom demand. Access typically comes through edge devices or credentials rather than phishing, and the self-propagating encryptor can spread and detonate within days of initial foothold.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+<!-- ANALYST NOTE -->
+<div class="callout analyst-note">
+  <div class="callout-label">Analyst Note</div>
+  <p>The Gentlemen typically needs to get inside the victim's network first, using methods such as FortiGate exploitation or stolen credentials. Once they gain access, the attackers can use tools such as PowerShell, PsExec, and WMI to discover systems, access other computers, and move through the network. They may then disable security controls and steal sensitive data before deploying ransomware.<p>
+
+<p>The attackers use data theft and encryption together to increase pressure on the victim. Even if the victim can recover their encrypted systems, the attackers can still threaten to publish the stolen data. I would look for unusual FortiGate activity, suspicious account use, PowerShell commands, PsExec/WMI activity, security-control changes, large data transfers, and ransomware deployment.</p>
+</div>
+
+<!-- ACTOR PROFILE -->
+<section id="profile">
+          <div class="eyebrow">Section 01</div>
+          <h2>Actor Profile</h2>
+
+          <h3>Origin &amp; structure</h3>
+          <p>The Gentlemen surfaced in mid-2025, founded by an operator known as hastalamuerte (also linked to the alias zeta88) after a public falling-out with the Qilin ransomware-as-a-service program. The group ran as a closed operation through the summer before opening an affiliate program in September 2025, absorbing operators who had previously worked with Embargo, LockBit, Medusa, and BlackLock.</p>
+
+          <h3>Targeting philosophy</h3>
+          <p>Unlike spray-and-pray ransomware crews, The Gentlemen researches targets before committing resources, favoring organizations whose revenue and cyber-insurance coverage make a paid settlement likely. Initial access runs almost entirely through internet-facing edge devices, chiefly unpatched Fortinet FortiGate appliances, and credentials purchased from infostealer-log markets rather than phishing.</p>
+
+          <h3>Extortion model</h3>
+          <p>Standard double extortion: data is exfiltrated before encryption, and a leak-site posting backs the ransom demand if the victim refuses to pay. Demands are reportedly calibrated to a victim's likely insurance ceiling using firmographic revenue data, and affiliates keep up to 90–93% of proceeds, an unusually generous split built to pull talent away from rival programs.</p>
+        </section>
+
+        <!-- TIMELINE -->
+        <section id="timeline">
+          <div class="eyebrow">Section 02</div>
+          <h2>Timeline of Activity</h2>
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-date">Jul 2025</div>
+              <h4>Formation</h4>
+              <p>The group forms after hastalamuerte's split from Qilin's ArmCorp affiliate group; early development stays private.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Aug–Sep 2025</div>
+              <h4>Public debut &amp; RaaS launch</h4>
+              <p>The closed operation goes public and opens an affiliate program, recruiting through underground forums.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Sep 2025</div>
+              <h4>BreachForums partnership</h4>
+              <p>An official partnership with BreachForums begins recruiting penetration testers and initial access brokers.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Dec 2025–Jan 2026</div>
+              <h4>Complexul Energetic Oltenia breach</h4>
+              <p>A Romanian energy provider is hit, one of the group's highest-profile early targets.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Q1 2026</div>
+              <h4>Rises to #2 globally</h4>
+              <p>Published victim volume puts the group second only to Qilin, the program its founders left months earlier.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Apr 2026</div>
+              <h4>Chain breach, UK to Turkey</h4>
+              <p>A UK software consultancy is compromised; reused credentials and internal documents cascade into a second breach at a Turkish partner.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">May 2026</div>
+              <h4>"Rocket" database leak</h4>
+              <p>An insider leaks a 16.22 GB internal database exposing nine named operators, negotiation transcripts, and the group's toolchain.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">May–Jun 2026</div>
+              <h4>Microsoft mapping &amp; industry ranking</h4>
+              <p>Microsoft (Storm-2697) publishes a technical teardown of the self-propagating encryptor; NTT later credits the group with 10% of observed ransomware attacks industry-wide.</p>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- TTPs / KILL CHAIN -->
+        <section id="ttps">
+          <div class="eyebrow">Section 03</div>
+          <h2>Kill Chain &amp; MITRE ATT&amp;CK Mapping</h2>
+          <p>The Gentlemen's kill chain leans almost entirely on unpatched edge devices and purchased credentials rather than phishing, then moves fast once inside affiliates are known to enumerate, evade, and detonate within days of gaining a foothold.</p>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">01</span><h3>Initial Access</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Exploit Public-Facing Application</span></div>
+              <p>Affiliates target internet-facing Fortinet FortiGate and Cisco appliances, most often via the FortiOS/FortiProxy authentication-bypass flaw CVE-2024-55591, alongside CVE-2025-32433 and CVE-2025-33073.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Valid Accounts</span></div>
+              <p>Where an edge device isn't exposed, affiliates authenticate directly using credentials bought from dark-web infostealer-log markets or brute-forced against exposed VPN and RDP endpoints.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">02</span><h3>Execution &amp; Persistence</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Command and Scripting Interpreter</span></div>
+              <p>PowerShell and native Windows command-line tools disable security controls, enumerate Active Directory, and identify privileged accounts ahead of deployment.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Scheduled Task / Remote Access Software</span></div>
+              <p>Persistence is maintained through scheduled tasks and self-restarting services, often alongside a legitimate remote-access tool installed under a disguised name.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">03</span><h3>Discovery &amp; Defense Evasion</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Impair Defenses</span></div>
+              <p>Operators disable Microsoft Defender, add broad exclusions, delete shadow copies, and strip prefetch data, RDP logs, and PowerShell history to slow incident response.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Exploitation for Privilege Escalation</span></div>
+              <p>UAC bypasses and vulnerable-driver abuse elevate a foothold to domain-level access before the encryptor is staged.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">04</span><h3>Collection &amp; Exfiltration</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Automated Exfiltration</span></div>
+              <p>Sensitive data is staged and pulled out, frequently over an unauthorized Cloudflare Zero Trust tunnel registered inside the victim's own environment, before encryption begins, underpinning the double-extortion threat.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">05</span><h3>Impact</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Data Encrypted for Impact</span></div>
+              <p>A custom Go-based encryptor using hybrid Curve25519/XChaCha20 encryption self-propagates across the network via multiple simultaneous lateral-movement techniques, typically pushed domain-wide through a modified Group Policy Object.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- IOCs -->
+        <section id="iocs">
+          <div class="eyebrow">Section 04</div>
+          <h2>Indicators of Compromise</h2>
+          <p>The Gentlemen's affiliates rarely rely on custom malware for initial access, so durable indicators center on the vulnerabilities and infrastructure patterns their intrusions consistently share.</p>
+
+          <h3>Reported patterns &amp; behavior</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Indicator / Behavior</th><th>Type</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">CVE-2024-55591</td><td>Vulnerability</td><td>FortiOS/FortiProxy authentication-bypass flaw; the group's primary initial-access vector</td></tr>
+                <tr><td class="mono">CVE-2025-32433</td><td>Vulnerability</td><td>Erlang/OTP SSH remote code execution flaw used against exposed management infrastructure</td></tr>
+                <tr><td class="mono">CVE-2025-33073</td><td>Vulnerability</td><td>NTLM reflection flaw abused for privilege escalation once inside</td></tr>
+                <tr><td class="mono">Unauthorized Cloudflare tunnel</td><td>Behavior</td><td>Zero Trust tunnels registered inside victim environments to maintain covert access</td></tr>
+                <tr><td class="mono">Shadow copy &amp; log deletion</td><td>Behavior</td><td>Prefetch, RDP logs, and PowerShell history wiped ahead of encryption</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- MITIGATIONS -->
+        <section id="mitigations">
+          <div class="eyebrow">Section 05</div>
+          <h2>Detection &amp; Mitigation Priorities</h2>
+          <p>Ordered by impact-to-effort ratio for a mid-sized enterprise.</p>
+          <ul class="mit-list">
+            <li><span class="pri">P1</span><span><strong>Patch internet-facing FortiGate and Cisco appliances immediately</strong>, prioritizing CVE-2024-55591, CVE-2025-32433, and CVE-2025-33073.</span></li>
+            <li><span class="pri">P1</span><span><strong>Disable NTLMv1 and enforce MFA</strong> on every VPN and remote-access endpoint.</span></li>
+            <li><span class="pri">P1</span><span><strong>Alert on shadow-copy deletion, Defender tampering, and log/prefetch clearing</strong> as near-certain precursors to encryption.</span></li>
+            <li><span class="pri">P2</span><span><strong>Audit and remove unauthorized Cloudflare Zero Trust tunnels</strong> and unexpected remote-access tooling.</span></li>
+            <li><span class="pri">P2</span><span><strong>Move backup infrastructure behind dedicated, credential-rotated management VLANs</strong> isolated from the production domain.</span></li>
+            <li><span class="pri">P3</span><span><strong>Prepare an extortion response playbook</strong> in advance, including legal, comms, and law enforcement contacts.</span></li>
+          </ul>
+
+        <!-- REFERENCES -->
+        <section id="references">
+          <div class="eyebrow">Section 06</div>
+          <h2>References</h2>
+          <ul class="source-list">
+            <li><span class="idx">01</span><a href="https://www.microsoft.com/en-us/security/blog/2026/05/28/the-gentlemen-ransomware-dissecting-a-self-propagating-go-encryptor/" target="_blank" rel="noopener">The Gentlemen Ransomware: Dissecting a Self-Propagating Go Encryptor</a><span class="pub">Microsoft Security Blog</span></li>
+            <li><span class="idx">02</span><a href="https://fortiguard.fortinet.com/threat-actor/6387/the-gentlemen-ransomware" target="_blank" rel="noopener">The Gentlemen Ransomware — Threat Actor Profile</a><span class="pub">FortiGuard Labs</span></li>
+            <li><span class="idx">03</span><a href="https://www.huntress.com/blog/the-gentlemen-ransomware-defense-evasion-ttps" target="_blank" rel="noopener">The Gentlemen Ransomware: Defense Evasion TTPs Uncovered</a><span class="pub">Huntress</span></li>
+            <li><span class="idx">04</span><a href="https://www.rescana.com/post/gentlemen-ransomware-actively-exploiting-fortinet-fortigate-vulnerabilities-478-victims-hit-by-rapid-worm-like-attacks" target="_blank" rel="noopener">Gentlemen Ransomware Actively Exploiting Fortinet FortiGate Vulnerabilities</a><span class="pub">Rescana</span></li>
+            <li><span class="idx">05</span><a href="https://redpiranha.net/news/the-gentlemen-ransomware-analysis" target="_blank" rel="noopener">The Gentlemen Ransomware: Threat Intelligence Analysis, TTPs &amp; Detection Guide</a><span class="pub">Red Piranha</span></li>
+            <li><span class="idx">06</span><a href="https://shieldworkz.com/blogs/threat-intelligence-briefing-the-gentlemen-ransomware" target="_blank" rel="noopener">Threat Intelligence Briefing: The Gentlemen Ransomware</a><span class="pub">ShieldWorkz</span></li>
+            <li><span class="idx">07</span><a href="https://socradar.io/blog/dark-web-profile-the-gentlemen-ransomware/" target="_blank" rel="noopener">Dark Web Profile: The Gentlemen Ransomware</a><span class="pub">SOCRadar</span></li>
+          </ul>
+        </section>
+
+      </main>
+
+      <footer>
+        <p class="fnote">Independent analysis synthesized from the public reporting cited above. Not affiliated with, endorsed by, or reviewed by any vendor cited.</p>
+        <div class="footer-meta">
+          <span class="footer-name">Dalton Hunter</span>
+          <div class="footer-social">
+            <a href="https://www.linkedin.com/in/dalton-hunter/" id="footer-linkedin" class="footer-social-link" aria-label="LinkedIn" target="_blank" rel="noopener">
+              <span class="footer-social-label">LinkedIn</span>
+              <svg class="footer-social-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </a>
+            <a href="https://github.com/dalthunter" id="footer-github" class="footer-social-link" aria-label="GitHub" target="_blank" rel="noopener">
+              <span class="footer-social-label">GitHub</span>
+              <svg class="footer-social-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.084-.729.084-.729 1.205.084 1.838 1.237 1.838 1.237 1.07 1.834 2.809 1.304 3.495.997.108-.775.42-1.305.763-1.605-2.665-.305-5.466-1.334-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+            </a>
+          </div>
+        </div>
+      </footer>
+
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
