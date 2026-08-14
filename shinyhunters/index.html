@@ -81,32 +81,68 @@
           <div class="threat-level">Threat Level: <strong>Critical</strong></div>
         </section>
 
-        <!-- ACTOR PROFILE -->
-        <section id="profile">
-          <div class="eyebrow">Section 01</div>
-          <h2>Actor Profile</h2>
+<style>
+  /* Key Findings grid */
+  .key-findings {
+    list-style: none;
+    margin: 6px 0 18px;
+    padding: 0;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f5f1e8;
+  }
+  .key-findings li {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 18px;
+    align-items: baseline;
+    margin: 0;
+    padding: 18px 20px;
+    border-left: 3px solid #8a3324;
+    background: #eeeae0;
+  }
+  .key-findings li:not(:last-child) {
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+  .key-findings li strong {
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #1a1a1a;
+    font-weight: 700;
+  }
+  .key-findings li span {
+    color: #2b2b2b;
+    line-height: 1.5;
+  }
+  h3.kf-heading {
+    color: #8a3324;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  @media (max-width: 640px) {
+    .key-findings li {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+  }
+</style>
 
-          <h3>Origin &amp; structure</h3>
-          <ul class="scan-list">
-            <li>Emerged around 2020 as a data theft and resale persona, initially built around dumping stolen databases on underground forums</li>
-            <li>Took ownership of BreachForums, the successor to RaidForums, and has operated it through several relaunches</li>
-            <li>Functions as a brand and persona shared across a loose network rather than a fixed roster, overlapping heavily with other "Com" linked crews such as Scattered Spider and Lapsus$</li>
-          </ul>
-
-          <h3>Targeting philosophy</h3>
-          <ul class="scan-list">
-            <li>Early activity centered on opportunistic theft from exposed cloud storage and source code repositories</li>
-            <li>Since 2024, shifted toward deliberate, identity driven intrusions against large SaaS and cloud platforms, most notably Snowflake customer environments and the Salesforce ecosystem</li>
-            <li>Sweeps up victims across retail, luxury goods, airlines, education, and technology in large connected campaigns</li>
-          </ul>
-
-          <h3>Extortion model</h3>
-          <ul class="scan-list">
-            <li>Data theft without encryption has historically been the group's signature, with victims pressured through email, Tox chat, and a branded leak site rather than a ransomware note</li>
-            <li>In 2025 began experimenting with a ransomware-as-a-service offering under the alias ShinySp1d3r</li>
-            <li>Continues its core business of bulk data theft and resale even as it expands into ransomware</li>
-          </ul>
-        </section>
+<!-- ACTOR PROFILE -->
+<section id="profile">
+  <div class="eyebrow">Section 01</div>
+  <h2>Actor Profile</h2>
+  <h3 class="kf-heading">Key Findings</h3>
+  <ul class="key-findings">
+    <li><strong>Origin</strong><span>Emerged around 2020 as a data theft/resale persona, took ownership of BreachForums, and operates as a shared brand across a loose network overlapping Scattered Spider and Lapsus$.</span></li>
+    <li><strong>Primary Target</strong><span>Large SaaS and cloud platforms since 2024, notably Snowflake customer environments and the Salesforce ecosystem, spanning retail, luxury goods, airlines, education, and tech.</span></li>
+    <li><strong>Initial Access</strong><span>Vishing calls impersonating IT support, reused stolen credentials from infostealer logs, and occasionally exposed cloud storage buckets.</span></li>
+    <li><strong>Primary Objective</strong><span>Bulk data theft and extortion without encryption as its signature model, with a 2025 expansion into ransomware under the ShinySp1d3r alias.</span></li>
+    <li><strong>Operating Method</strong><span>Abuses stolen OAuth tokens and session cookies to persist, enumerates connected SaaS tenants, and exfiltrates via the platform's own native export/API tooling.</span></li>
+    <li><strong>Defense Priorities</strong><span>Audit OAuth/connected app scopes, require callback verification for help desk resets, enforce least-privilege API access on data warehouses, and monitor for MFA-notification deletion.</span></li>
+  </ul>
+</section>
 
         <!-- TTPs / KILL CHAIN -->
         <section id="ttps">
