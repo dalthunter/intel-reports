@@ -81,32 +81,68 @@
           <div class="threat-level">Threat Level: <strong>Critical</strong></div>
         </section>
 
-        <!-- ACTOR PROFILE -->
-        <section id="profile">
-          <div class="eyebrow">Section 01</div>
-          <h2>Actor Profile</h2>
+<style>
+  /* Key Findings grid */
+  .key-findings {
+    list-style: none;
+    margin: 6px 0 18px;
+    padding: 0;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f5f1e8;
+  }
+  .key-findings li {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 18px;
+    align-items: baseline;
+    margin: 0;
+    padding: 18px 20px;
+    border-left: 3px solid #8a3324;
+    background: #eeeae0;
+  }
+  .key-findings li:not(:last-child) {
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+  .key-findings li strong {
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #1a1a1a;
+    font-weight: 700;
+  }
+  .key-findings li span {
+    color: #2b2b2b;
+    line-height: 1.5;
+  }
+  h3.kf-heading {
+    color: #8a3324;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  @media (max-width: 640px) {
+    .key-findings li {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+  }
+</style>
 
-          <h3>Origin &amp; structure</h3>
-          <ul class="scan-list">
-            <li>Emerged in May 2022, formed largely of native English speaking teenagers and young adults from the US, UK, and Canada, tied to a broader loose network known as "The Com"</li>
-            <li>Members coordinate over Telegram and Discord rather than through a fixed hierarchy</li>
-            <li>This loose structure is part of why the group has kept operating through repeated arrests of individual members</li>
-          </ul>
-
-          <h3>Targeting philosophy</h3>
-          <ul class="scan-list">
-            <li>Early activity in 2022 focused on telecom and business process outsourcing firms</li>
-            <li>By 2023 the group had expanded into gaming, hospitality, retail, and financial services</li>
-            <li>Activity often arrives in sector "waves," with weeks of concentrated attacks against one industry, such as retail or insurance, before the group shifts its attention elsewhere</li>
-          </ul>
-
-          <h3>Extortion model</h3>
-          <ul class="scan-list">
-            <li>Data theft and encryption for double extortion pressure</li>
-            <li>Moves between ransomware brands, including BlackCat/ALPHV, RansomHub, Qilin, and DragonForce, rather than maintaining a single encryptor of its own</li>
-            <li>Recent activity has shifted toward encrypting VMware vSphere and ESXi hosts directly, taking every hosted virtual machine down at once</li>
-          </ul>
-        </section>
+<!-- ACTOR PROFILE -->
+<section id="profile">
+  <div class="eyebrow">Section 01</div>
+  <h2>Actor Profile</h2>
+  <h3 class="kf-heading">Key Findings</h3>
+  <ul class="key-findings">
+    <li><strong>Origin</strong><span>Emerged May 2022, formed largely of native English-speaking teenagers and young adults from the US, UK, and Canada, tied to the broader "The Com" network.</span></li>
+    <li><strong>Primary Target</strong><span>Telecom and BPO firms early on, expanding by 2023 into gaming, hospitality, retail, and financial services, often hitting one sector in concentrated waves.</span></li>
+    <li><strong>Initial Access</strong><span>Help desk impersonation to trigger password resets or MFA re-enrollment, and SIM swapping to intercept SMS-based MFA codes.</span></li>
+    <li><strong>Primary Objective</strong><span>Double extortion via data theft and encryption, borrowing ransomware brands like BlackCat/ALPHV, RansomHub, Qilin, and DragonForce.</span></li>
+    <li><strong>Operating Method</strong><span>Disables EDR with vulnerable drivers, maps cloud/identity systems, push-bombs MFA, then increasingly encrypts VMware ESXi hosts directly at the hypervisor level.</span></li>
+    <li><strong>Defense Priorities</strong><span>Require callback verification for help desk resets, move to phishing-resistant MFA, alert on new MFA devices, and closely monitor virtualization admin access.</span></li>
+  </ul>
+</section>
 
         <!-- TTPs / KILL CHAIN -->
         <section id="ttps">
