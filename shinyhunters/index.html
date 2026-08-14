@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShinyHunters: Threat Actor Profile | Dalton Hunter</title>
+<meta name="description" content="Threat intelligence assessment on ShinyHunters (UNC6040, ShinyCorp): vishing driven SaaS extortion, OAuth token abuse, MITRE ATT&CK mapping, and mitigation guidance.">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Scannable bullet lists used throughout Actor Profile and other prose sections */
+  ul.scan-list {
+    margin: 6px 0 18px;
+    padding-left: 20px;
+  }
+  ul.scan-list li {
+    margin-bottom: 7px;
+    line-height: 1.5;
+  }
+  ul.scan-list li:last-child { margin-bottom: 0; }
+
+  /* Tighter spacing for Analyst Notes nested inside a phase or section, vs. a full-width callout */
+  .phase-note {
+    margin-top: 14px;
+    margin-bottom: 0;
+    padding: 12px 16px;
+  }
+  .phase-note p { margin: 4px 0 0; font-size: 0.92rem; }
+
+  /* CVE and MITRE ATT&CK reference links */
+  a.cve-link, a.mitre-link {
+    color: #1a56db;
+    text-decoration: underline;
+    text-decoration-color: rgba(26,86,219,0.4);
+  }
+  a.cve-link:hover, a.mitre-link:hover {
+    text-decoration-color: #1a56db;
+  }
+
+  /* Tighten the gap between a section's h2 title and the first h3 subheading beneath it */
+  main section h2 { margin-bottom: 6px; }
+  main section h3:first-of-type { margin-top: 2px; }
+</style>
+</head>
+<body>
+<a href="#overview" class="skip-link">Skip to content</a>
+
+<div class="desk">
+  <div class="folder-wrap">
+
+    <div class="folder-tab">Dalton Hunter</div>
+
+    <div class="paper">
+
+      <header class="doc-header">
+        <div class="doc-header-title">Threat Actor Profile</div>
+        <div class="doc-header-right">
+          <div class="doc-author">Dalton Hunter</div>
+          <div class="doc-date">August 2026</div>
+        </div>
+      </header>
+
+      <!-- Top nav -->
+      <nav class="topnav" aria-label="Report sections">
+        <div class="topnav-inner">
+          <a class="navlink" href="#overview">Overview</a>
+          <a class="navlink" href="#profile">Actor Profile</a>
+          <a class="navlink" href="#timeline">Timeline</a>
+          <a class="navlink" href="#ttps">Kill Chain / TTPs</a>
+          <a class="navlink" href="#iocs">IOCs</a>
+          <a class="navlink" href="#mitigations">Mitigations</a>
+          <a class="navlink" href="#references">References</a>
+        </div>
+      </nav>
+
+      <main>
+
+        <!-- HERO / OVERVIEW -->
+        <section id="overview" class="hero">
+          <div class="hero-kicker">Threat Actor Profile: Data Extortion &amp; Leak Marketplace Collective</div>
+          <h1>ShinyHunters</h1>
+          <div class="aka">aka ShinyCorp · UNC6040 · UNC6041 · UNC6395 · UNC6661 · UNC6671</div>
+          <div class="threat-level">Threat Level: <strong>Critical</strong></div>
+        </section>
+
+        <!-- ACTOR PROFILE -->
+        <section id="profile">
+          <div class="eyebrow">Section 01</div>
+          <h2>Actor Profile</h2>
+
+          <h3>Origin &amp; structure</h3>
+          <ul class="scan-list">
+            <li>Emerged around 2020 as a data theft and resale persona, initially built around dumping stolen databases on underground forums</li>
+            <li>Took ownership of BreachForums, the successor to RaidForums, and has operated it through several relaunches</li>
+            <li>Functions as a brand and persona shared across a loose network rather than a fixed roster, overlapping heavily with other "Com" linked crews such as Scattered Spider and Lapsus$</li>
+          </ul>
+
+          <h3>Targeting philosophy</h3>
+          <ul class="scan-list">
+            <li>Early activity centered on opportunistic theft from exposed cloud storage and source code repositories</li>
+            <li>Since 2024, shifted toward deliberate, identity driven intrusions against large SaaS and cloud platforms, most notably Snowflake customer environments and the Salesforce ecosystem</li>
+            <li>Sweeps up victims across retail, luxury goods, airlines, education, and technology in large connected campaigns</li>
+          </ul>
+
+          <h3>Extortion model</h3>
+          <ul class="scan-list">
+            <li>Data theft without encryption has historically been the group's signature, with victims pressured through email, Tox chat, and a branded leak site rather than a ransomware note</li>
+            <li>In 2025 began experimenting with a ransomware-as-a-service offering under the alias ShinySp1d3r</li>
+            <li>Continues its core business of bulk data theft and resale even as it expands into ransomware</li>
+          </ul>
+        </section>
+
+        <!-- TIMELINE -->
+        <section id="timeline">
+          <div class="eyebrow">Section 02</div>
+          <h2>Timeline of Activity</h2>
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-date">2020</div>
+              <h4>Public emergence</h4>
+              <p>The ShinyHunters persona surfaces selling stolen databases from a string of e-commerce and tech companies on underground forums.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">May 2022</div>
+              <h4>Raoult arrest</h4>
+              <p>French programmer Sébastien Raoult, tied to the group, is arrested in Morocco and later extradited to the US.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Jun 2023</div>
+              <h4>BreachForums v2</h4>
+              <p>ShinyHunters partners with Baphomet to relaunch BreachForums after its original founder's arrest.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Apr to Jun 2024</div>
+              <h4>Snowflake customer campaign</h4>
+              <p>Stolen credentials against unprotected Snowflake customer accounts lead to mass data theft and extortion across dozens of organizations.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">2025</div>
+              <h4>Salesforce &amp; SaaS pivot</h4>
+              <p>Vishing campaigns, tracked as UNC6040, and OAuth token abuse against Salesforce, Drift, and Gainsight integrations hit Google, Adidas, Qantas, Allianz Life, and multiple luxury brands.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Jun 2025</div>
+              <h4>France arrests</h4>
+              <p>French authorities arrest four suspects tied to the ShinyHunters, Hollow, Noct, and Depressed personas over BreachForums administration.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">Oct 2025</div>
+              <h4>BreachForums seized</h4>
+              <p>The FBI seizes BreachForums infrastructure; ShinyHunters publicly walks away from the forum and leaks data on 300,000 of its own users.</p>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">2026</div>
+              <h4>Education &amp; SaaS extortion wave</h4>
+              <p>Campaigns tracked as UNC6661 and UNC6671 hit universities, and reported victims through the year include Wynn Resorts, Panera Bread, Grubhub, Canvas, and 7-Eleven.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- TTPs / KILL CHAIN -->
+        <section id="ttps">
+          <div class="eyebrow">Section 03</div>
+          <h2>Kill Chain &amp; MITRE ATT&amp;CK Mapping</h2>
+          <p>ShinyHunters rarely needs to exploit software. Access begins with a phone call, a stolen OAuth token, or an exposed credential, and the goal from there is bulk data collection rather than deployment of a payload.</p>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">01</span><h3>Initial Access</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name"><a class="mitre-link" href="https://attack.mitre.org/techniques/T1566/004/" target="_blank" rel="noopener">Spearphishing Voice (Vishing)</a></span></div>
+              <p>Callers pose as internal IT support and walk an employee through authorizing a lookalike connected app or entering credentials into a fake verification page.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name"><a class="mitre-link" href="https://attack.mitre.org/techniques/T1078/" target="_blank" rel="noopener">Valid Accounts</a></span></div>
+              <p>Credentials stolen through infostealer logs or purchased from initial access brokers are reused to log directly into cloud and SaaS platforms.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name"><a class="mitre-link" href="https://attack.mitre.org/techniques/T1190/" target="_blank" rel="noopener">Exploit Public-Facing Application</a></span></div>
+              <p>Misconfigured cloud storage buckets and exposed developer secrets provide a secondary, more opportunistic entry point.</p>
+            </div>
+            <div class="callout analyst-note phase-note">
+              <div class="callout-label">Analyst Note</div>
+              <p>They get in through IT impersonation phone calls, reused stolen logins, or occasionally an exposed cloud storage bucket.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">02</span><h3>Persistence &amp; Privilege Access</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name"><a class="mitre-link" href="https://attack.mitre.org/techniques/T1528/" target="_blank" rel="noopener">Steal Application Access Token</a></span></div>
+              <p>OAuth and refresh tokens tied to third party SaaS integrations, such as Drift and Gainsight, are abused to reach connected Salesforce environments without triggering a login alert.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name"><a class="mitre-link" href="https://attack.mitre.org/techniques/T1556/003/" target="_blank" rel="noopener">Modify Authentication Process: Web Session Cookie</a></span></div>
+              <p>Stolen session cookies and forged authentication material allow continued access after an initial credential is rotated.</p>
+            </div>
+            <div class="callout analyst-note phase-note">
+              <div class="callout-label">Analyst Note</div>
+              <p>Stolen tokens and session cookies let them stay in even after a password is changed.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">03</span><h3>Discovery &amp; Defense Evasion</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name"><a class="mitre-link" href="https://attack.mitre.org/techniques/T1087/" target="_blank" rel="noopener">Account Discovery</a></span></div>
+              <p>Compromised access is used to enumerate connected SaaS tenants, cloud storage buckets, and downstream integrations before bulk collection begins.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">MFA Notification Suppression</span></div>
+              <p>In some intrusions, a Gmail add-on has reportedly been silently authorized to delete MFA enrollment notification emails, delaying victim detection of a new device registration.</p>
+            </div>
+            <div class="callout analyst-note phase-note">
+              <div class="callout-label">Analyst Note</div>
+              <p>They map out connected accounts and, in some cases, quietly delete the email alerts that would normally warn you about a new device login.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">04</span><h3>Collection &amp; Exfiltration</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name"><a class="mitre-link" href="https://attack.mitre.org/techniques/T1530/" target="_blank" rel="noopener">Data from Cloud Storage</a></span></div>
+              <p>Large scale queries pull records directly from Snowflake warehouses, Google BigQuery, SharePoint, OneDrive, and Salesforce objects ahead of extortion.</p>
+            </div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Bulk Export via Legitimate Tooling</span></div>
+              <p>Native export and API functionality of the compromised SaaS platform itself is used to move data out, blending with normal administrative activity.</p>
+            </div>
+            <div class="callout analyst-note phase-note">
+              <div class="callout-label">Analyst Note</div>
+              <p>Large amounts of data are pulled straight out through the platform's own export tools, which can look like normal admin activity.</p>
+            </div>
+          </div>
+
+          <div class="phase">
+            <div class="phase-head"><span class="phase-num">05</span><h3>Impact</h3></div>
+            <div class="ttp-card">
+              <div class="ttp-top"><span class="ttp-name">Data Leak Site &amp; Direct Extortion</span></div>
+              <p>Victims are pressured through email, Tox chat, and a branded leak site with sample records; some campaigns add harassment or DDoS pressure, and a smaller share involve an affiliate ransomware payload under the ShinySp1d3r brand.</p>
+            </div>
+            <div class="callout analyst-note phase-note">
+              <div class="callout-label">Analyst Note</div>
+              <p>There's no ransomware in most cases, just pressure through email, chat, and a leak site until payment is made.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- IOCs -->
+        <section id="iocs">
+          <div class="eyebrow">Section 04</div>
+          <h2>Indicators of Compromise</h2>
+          <p>As with most identity-driven actors, the durable signal is behavioral rather than a fixed file hash. What follows are the publicly reported patterns to watch for.</p>
+
+          <h3>Reported patterns &amp; behavior</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Indicator / Behavior</th><th>Type</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">New OAuth app authorized to Salesforce or Google Workspace</td><td>Behavior</td><td>Common vector for downstream SaaS data theft</td></tr>
+                <tr><td class="mono">Unrecognized "Drift" or "Gainsight" style connected app</td><td>App / integration</td><td>Reported vector into Salesforce customer instances</td></tr>
+                <tr><td class="mono">Bulk export or API pull from Snowflake / BigQuery outside normal hours</td><td>Behavior</td><td>Precedes extortion contact in several disclosed cases</td></tr>
+                <tr><td class="mono">Gmail add-on with mail deletion scope, unexpectedly authorized</td><td>Behavior</td><td>Used to suppress MFA enrollment notification emails</td></tr>
+                <tr><td class="mono">Help desk call requesting SSO credential or MFA code entry</td><td>Behavior</td><td>Vishing pattern tracked under UNC6040 / UNC6661</td></tr>
+                <tr><td class="mono">Extortion contact via Tox ID or ShinyHunters branded leak site</td><td>Infrastructure</td><td>Follows successful exfiltration rather than encryption</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout analyst-note phase-note">
+            <div class="callout-label">Analyst Note</div>
+            <p>None of these signals need a malware sample. A new connected app followed by a large export from Snowflake or Salesforce is a strong combined signal of this group's approach.</p>
+          </div>
+        </section>
+
+        <!-- MITIGATIONS -->
+        <section id="mitigations">
+          <div class="eyebrow">Section 05</div>
+          <h2>Detection &amp; Mitigation Priorities</h2>
+          <p>Ordered by impact-to-effort ratio for a mid-sized enterprise running SaaS and cloud data platforms.</p>
+          <ul class="mit-list">
+            <li><span class="pri">P1</span><span><strong>Audit and restrict OAuth/connected app scopes</strong> in Salesforce, Google Workspace, and Microsoft 365, especially anything with mail or bulk data export permissions.</span></li>
+            <li><span class="pri">P1</span><span><strong>Require callback verification through a known number</strong> before any help desk password reset or MFA re-enrollment.</span></li>
+            <li><span class="pri">P1</span><span><strong>Enforce IP allowlisting and least-privilege API access</strong> on Snowflake, BigQuery, and other analytics warehouses holding customer data.</span></li>
+            <li><span class="pri">P2</span><span><strong>Alert on new MFA device registrations and on deletion of MFA enrollment emails</strong> before a user reports missing notifications.</span></li>
+            <li><span class="pri">P2</span><span><strong>Move to phishing resistant MFA</strong> (FIDO2 hardware keys) for accounts with SaaS admin or data export rights.</span></li>
+            <li><span class="pri">P3</span><span><strong>Monitor underground forums and leak sites</strong> for early mention of your organization ahead of a direct extortion contact.</span></li>
+          </ul>
+
+          <div class="callout analyst-note phase-note">
+            <div class="callout-label">Analyst Note</div>
+            <p>Restricting OAuth app scopes and requiring callback verification for help desk resets covers the group's two most common entry points.</p>
+          </div>
+        </section>
+
+        <!-- REFERENCES -->
+        <section id="references">
+          <div class="eyebrow">Section 06</div>
+          <h2>References</h2>
+          <ul class="source-list">
+            <li><span class="idx">01</span><a href="https://attack.mitre.org/campaigns/C0059/" target="_blank" rel="noopener">Salesforce Data Exfiltration, Campaign C0059</a><span class="pub">MITRE ATT&amp;CK</span></li>
+            <li><span class="idx">02</span><a href="https://www.huntress.com/threat-library/threat-actors/shinyhunters" target="_blank" rel="noopener">ShinyHunters Threat Actor Profile: TTPs, IOCs &amp; Attacks</a><span class="pub">Huntress</span></li>
+            <li><span class="idx">03</span><a href="https://www.sophos.com/en-us/blog/taking-the-shine-off-breachforums" target="_blank" rel="noopener">Taking the Shine off BreachForums</a><span class="pub">Sophos</span></li>
+            <li><span class="idx">04</span><a href="https://unit42.paloaltonetworks.com/shinyhunters-ransomware-extortion/" target="_blank" rel="noopener">Bling Libra's Tactical Evolution: The Group Behind ShinyHunters Ransomware</a><span class="pub">Unit 42, Palo Alto Networks</span></li>
+            <li><span class="idx">05</span><a href="https://securityboulevard.com/2026/05/shinyhunters-the-group-behind-300-breaches/" target="_blank" rel="noopener">ShinyHunters: The Group Behind 300+ Breaches</a><span class="pub">Security Boulevard</span></li>
+            <li><span class="idx">06</span><a href="https://www.docontrol.io/blog/shinyhunters" target="_blank" rel="noopener">Who Is ShinyHunters? Tactics, Top Attacks &amp; How to Protect Your Organization</a><span class="pub">DoControl</span></li>
+            <li><span class="idx">07</span><a href="https://en.wikipedia.org/wiki/BreachForums" target="_blank" rel="noopener">BreachForums</a><span class="pub">Wikipedia</span></li>
+          </ul>
+        </section>
+
+      </main>
+
+      <footer>
+        <p class="fnote">Independent analysis synthesized from the public reporting cited above. Not affiliated with, endorsed by, or reviewed by any vendor cited.</p>
+        <div class="footer-meta">
+          <span class="footer-name">Dalton Hunter</span>
+          <div class="footer-social">
+            <a href="https://www.linkedin.com/in/dalton-hunter/" id="footer-linkedin" class="footer-social-link" aria-label="LinkedIn" target="_blank" rel="noopener">
+              <span class="footer-social-label">LinkedIn</span>
+              <svg class="footer-social-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </a>
+            <a href="https://github.com/dalthunter" id="footer-github" class="footer-social-link" aria-label="GitHub" target="_blank" rel="noopener">
+              <span class="footer-social-label">GitHub</span>
+              <svg class="footer-social-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.084-.729.084-.729 1.205.084 1.838 1.237 1.838 1.237 1.07 1.834 2.809 1.304 3.495.997.108-.775.42-1.305.763-1.605-2.665-.305-5.466-1.334-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+            </a>
+          </div>
+        </div>
+      </footer>
+
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
