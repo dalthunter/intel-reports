@@ -81,33 +81,73 @@
           <div class="threat-level">Threat Level: <strong>Critical</strong></div>
         </section>
 
-        <!-- ACTOR PROFILE -->
-        <section id="profile">
-          <div class="eyebrow">Section 01</div>
-          <h2>Actor Profile</h2>
+<style>
+  /* Key Findings grid */
+  .key-findings {
+    list-style: none;
+    margin: 6px 0 18px;
+    padding: 0;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f5f1e8;
+  }
+  .key-findings li {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 18px;
+    align-items: baseline;
+    margin: 0;
+    padding: 18px 20px;
+    border-left: 3px solid #8a3324;
+    background: #eeeae0;
+  }
+  .key-findings li:not(:last-child) {
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+  .key-findings li strong {
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #1a1a1a;
+    font-weight: 700;
+  }
+  .key-findings li span {
+    color: #2b2b2b;
+    line-height: 1.5;
+  }
+  h3.kf-heading {
+    color: #8a3324;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  @media (max-width: 640px) {
+    .key-findings li {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+  }
+</style>
 
-          <h3>Origin &amp; structure</h3>
-          <ul class="scan-list">
-            <li>Operated since at least 2013, centered in Eastern Europe and Russia</li>
-            <li>Organized less like a hacking crew and more like a company: compartmentalized teams handle malware development, phishing operations, money laundering, and management separately from one another</li>
-            <li>This structure is part of why the group has kept functioning through multiple US indictments and member arrests since 2018, since no single arrest removes the infrastructure or the playbook</li>
-          </ul>
-
-          <h3>Targeting philosophy</h3>
-          <ul class="scan-list">
-            <li>Early campaigns focused heavily on point-of-sale systems in the restaurant, hospitality, and gaming sectors, using fraudulent tech-support phone calls and phishing emails to plant Carbanak based malware and harvest payment card data at scale</li>
-            <li>Since approximately 2020, pivoted toward big game hunting: high-value, targeted network intrusions across retail, financial services, healthcare, software, and manufacturing</li>
-            <li>More recently includes a documented campaign against a major US automotive manufacturer</li>
-          </ul>
-
-          <h3>Extortion model</h3>
-          <ul class="scan-list">
-            <li>Card data resale was the original revenue engine</li>
-            <li>Since around 2020 has increasingly deployed or enabled ransomware, with researchers linking probable FIN7 activity to REvil, DarkSide, BlackMatter, ALPHV, Black Basta, Maze, and Ryuk deployments</li>
-            <li>Reported ties to the destructive Anubis ransomware-as-a-service brand</li>
-            <li>Also sells EDR evasion tooling to other criminal groups, monetizing its technical capability even where it isn't the one holding the ransom note</li>
-          </ul>
-        </section>
+<!-- ACTOR PROFILE -->
+<section id="profile">
+  <div class="eyebrow">Section 01</div>
+  <h2>Actor Profile</h2>
+  <h3 class="kf-heading">Key Findings</h3>
+  <ul class="key-findings">
+    <li><strong>Origin</strong><span>Cybercrime enterprise active since at least 2013, centered in Eastern Europe and Russia, organized into compartmentalized teams rather than a single crew.</span></li>
+    
+    <li><strong>Primary Target</strong><span>Retail, financial services, healthcare, software, and manufacturing organizations, including a documented campaign against a major US automotive manufacturer.</span></li>
+    
+    <li><strong>Initial Access</strong><span>Malvertising and fake software download pages, malicious USB drives mailed to targets, and trojanized legitimate tooling.</span></li>
+    
+    <li><strong>Primary Objective</strong><span>Originally bulk payment card theft from point-of-sale systems; since around 2020, high-value ransomware deployment and EDR evasion tool sales.</span></li>
+    
+    <li><strong>Operating Method</strong><span>Custom loaders and backdoors establish access, followed by dedicated EDR-disabling tooling and low-visibility persistence before escalation.</span></li>
+    
+    <li><strong>Defense Priorities</strong><span>Restrict software installation sources, alert on EDR/AV tampering, control removable media, and maintain offline tested backups.</span></li>
+  </ul>
+</section>
 
         <!-- TTPs / KILL CHAIN -->
         <section id="ttps">
