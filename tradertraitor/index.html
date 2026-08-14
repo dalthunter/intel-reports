@@ -84,30 +84,19 @@
 
 <!-- ACTOR PROFILE -->
 <section id="profile">
-          <div class="eyebrow">Section 01</div>
-          <h2>Actor Profile</h2>
+  <div class="eyebrow">Section 01</div>
+  <h2>Actor Profile</h2>
 
-          <h3>Origin &amp; structure</h3>
-          <ul class="scan-list">
-            <li>DPRK state-sponsored actor assessed to operate under North Korea's Reconnaissance General Bureau, with some analysis pointing to the 3rd Bureau (Foreign Intelligence)</li>
-            <li>Emerged from the remnants of APT38, the group behind the 2016 Bangladesh Bank heist, and is tracked as a Lazarus subgroup</li>
-            <li>Active against the cryptocurrency and blockchain ecosystem since at least 2020, first named in a joint FBI/CISA/Treasury advisory in April 2022</li>
-          </ul>
-
-          <h3>Targeting philosophy</h3>
-          <ul class="scan-list">
-            <li>Highly targeted rather than spray-and-pray: individual developers, sysadmins, and DevOps staff at crypto and blockchain companies are researched and approached directly</li>
-            <li>Primary lure is fake recruiting: LinkedIn messages posing as a recruiter offering a lucrative engineering role, escalating to a malicious job-offer PDF, test script, or trojanized app</li>
-            <li>Increasingly pivots through third-party vendors and supply chains (e.g. a wallet provider or npm package) rather than attacking the ultimate target directly</li>
-          </ul>
-
-          <h3>Objective &amp; monetization</h3>
-          <ul class="scan-list">
-            <li>Primary goal is direct theft of cryptocurrency, not extortion: stolen keys or hijacked infrastructure are used to drain wallets or approve fraudulent transactions</li>
-            <li>Proceeds are assessed to fund the North Korean regime and evade international sanctions, with some reporting linking revenue to weapons programs</li>
-            <li>Secondary objective reported by some agencies is espionage against the defense industrial base, alongside the financially-driven crypto operations</li>
-          </ul>
-        </section>
+  <h3>Key Findings</h3>
+  <ol class="scan-list">
+    <li><strong>Origin:</strong> DPRK state-sponsored actor assessed to operate under North Korea's Reconnaissance General Bureau and tracked as a Lazarus subgroup.</li>
+    <li><strong>Primary target:</strong> Cryptocurrency and blockchain organizations, particularly developers, sysadmins, and DevOps personnel.</li>
+    <li><strong>Initial access:</strong> Social engineering, fake job offers, compromised credentials, and increasingly third-party supply-chain compromises.</li>
+    <li><strong>Primary objective:</strong> Cryptocurrency and digital asset theft through stolen credentials, private keys, and compromised infrastructure.</li>
+    <li><strong>Operating method:</strong> Patiently maps cloud environments and trusted third-party infrastructure before executing high-value theft.</li>
+    <li><strong>Defense priorities:</strong> Protect developer accounts, enforce least-privilege IAM, secure third-party dependencies, and monitor unauthorized cloud activity.</li>
+  </ol>
+</section>
 
         <!-- TTPs / KILL CHAIN -->
         <section id="ttps">
