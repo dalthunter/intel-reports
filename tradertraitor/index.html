@@ -82,28 +82,64 @@
 
         </section>
 
-```html
+<style>
+  /* Key Findings grid */
+  .key-findings {
+    list-style: none;
+    margin: 6px 0 18px;
+    padding: 0;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .key-findings li {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 18px;
+    align-items: baseline;
+    margin: 0;
+    padding: 12px 16px;
+    border-left: 3px solid #1a56db;
+    background: rgba(26,86,219,0.03);
+  }
+  .key-findings li:not(:last-child) {
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+  .key-findings li strong {
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #1a56db;
+    font-weight: 700;
+  }
+  @media (max-width: 640px) {
+    .key-findings li {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+  }
+</style>
+
 <!-- ACTOR PROFILE -->
 <section id="profile">
   <div class="eyebrow">Section 01</div>
   <h2>Actor Profile</h2>
 
   <h3>Key Findings</h3>
-  <ul class="scan-list key-findings">
-    <li><strong>Origin:</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DPRK state-sponsored actor assessed to operate under North Korea's Reconnaissance General Bureau and tracked as a Lazarus subgroup.</li>
+  <ul class="key-findings">
+    <li><strong>Origin</strong><span>DPRK state-sponsored actor assessed to operate under North Korea's Reconnaissance General Bureau and tracked as a Lazarus subgroup.</span></li>
 
-    <li><strong>Primary Target:</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Cryptocurrency and blockchain organizations, particularly developers, sysadmins, and DevOps personnel.</li>
+    <li><strong>Primary Target</strong><span>Cryptocurrency and blockchain organizations, particularly developers, sysadmins, and DevOps personnel.</span></li>
 
-    <li><strong>Initial Access:</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Social engineering, fake job offers, compromised credentials, and increasingly third-party supply-chain compromises.</li>
+    <li><strong>Initial Access</strong><span>Social engineering, fake job offers, compromised credentials, and increasingly third-party supply-chain compromises.</span></li>
 
-    <li><strong>Primary Objective:</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Cryptocurrency and digital asset theft through stolen credentials, private keys, and compromised infrastructure.</li>
+    <li><strong>Primary Objective</strong><span>Cryptocurrency and digital asset theft through stolen credentials, private keys, and compromised infrastructure.</span></li>
 
-    <li><strong>Operating Method:</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Patiently maps cloud environments and trusted third-party infrastructure before executing high-value theft.</li>
+    <li><strong>Operating Method</strong><span>Patiently maps cloud environments and trusted third-party infrastructure before executing high-value theft.</span></li>
 
-    <li><strong>Defense Priorities:</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Protect developer accounts, enforce least-privilege IAM, secure third-party dependencies, and monitor unauthorized cloud activity.</li>
+    <li><strong>Defense Priorities</strong><span>Protect developer accounts, enforce least-privilege IAM, secure third-party dependencies, and monitor unauthorized cloud activity.</span></li>
   </ul>
 </section>
-```
 
 
         <!-- TTPs / KILL CHAIN -->
