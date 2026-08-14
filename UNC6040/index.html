@@ -81,33 +81,25 @@
           <div class="threat-level">Threat Level: <strong>High</strong></div>
         </section>
 
-        <!-- ACTOR PROFILE -->
-        <section id="profile">
-          <div class="eyebrow">Section 01</div>
-          <h2>Actor Profile</h2>
-
-          <h3>Origin &amp; designation</h3>
-          <ul class="scan-list">
-            <li>An "uncategorized" cluster designation used by Google Threat Intelligence Group (GTIG) for intrusions tied together by shared tradecraft, not yet linked to a named, persistent group</li>
-            <li>Publicly disclosed by Google in June 2025, though MITRE ATT&amp;CK's mapping of the associated campaign traces the earliest related intrusions back to October 2024</li>
-            <li>Specializes in a single, repeatable move: calling an employee, posing as IT support, and talking them into authorizing a fake Salesforce Data Loader app that quietly exports the CRM</li>
-          </ul>
-
-          <h3>Relationship to ShinyHunters &amp; The Com</h3>
-          <ul class="scan-list">
-            <li>Functions as the access broker, not the extortionist</li>
-            <li>Mandiant reports a separate cluster, tracked as UNC6240 and self-identifying as "ShinyHunters," typically handles the follow-on extortion demand after UNC6040 completes the theft</li>
-            <li>No direct evidence the same individuals sit behind both clusters</li>
-            <li>Overlap in targeting Okta credentials and IT support impersonation ties the wider ecosystem to "The Com," the loose network also linked to Scattered Spider — though shared tradecraft isn't proof of a shared roster</li>
-          </ul>
-
-          <h3>Targeting philosophy</h3>
-          <ul class="scan-list">
-            <li>Narrow, CRM-specific objective rather than broad, network-wide access</li>
-            <li>Goal is to get one authorized connected app into a victim's Salesforce environment</li>
-            <li>Exports as much customer and contact data as possible before access is noticed or revoked</li>
-          </ul>
-        </section>
+<!-- ACTOR PROFILE -->
+<section id="profile">
+  <div class="eyebrow">Section 01</div>
+  <h2>Actor Profile</h2>
+  <h3>Key Findings</h3>
+  <ul class="key-findings">
+    <li><strong>Origin</strong><span>Uncategorized cluster designation used by Google Threat Intelligence Group, publicly disclosed June 2025; not yet linked to a named, persistent group.</span></li>
+    
+    <li><strong>Primary Target</strong><span>Organizations running Salesforce CRM environments, with access gained by targeting English-speaking employees via phone.</span></li>
+    
+    <li><strong>Initial Access</strong><span>Vishing calls impersonating internal IT support, tricking employees into authorizing a fake "Data Loader" connected app via OAuth Device Flow.</span></li>
+    
+    <li><strong>Primary Objective</strong><span>Bulk theft of CRM customer and contact data, later handed off to a separate persona (UNC6240 / ShinyHunters) for extortion.</span></li>
+    
+    <li><strong>Operating Method</strong><span>Exfiltrates data in slow, incremental batches designed to resemble routine sync activity, routing calls and data movement through VPNs and Tor to mask origin.</span></li>
+    
+    <li><strong>Defense Priorities</strong><span>Restrict self-authorization of connected apps, require live video verification for help desk requests, and monitor for anomalous Data Loader / API bulk exports.</span></li>
+  </ul>
+</section>
 
         <!-- TTPs / KILL CHAIN -->
         <section id="ttps">
