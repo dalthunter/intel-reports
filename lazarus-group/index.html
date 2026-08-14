@@ -81,32 +81,68 @@
           <div class="threat-level">Threat Level: <strong>Critical</strong></div>
         </section>
 
-        <!-- ACTOR PROFILE -->
-        <section id="profile">
-          <div class="eyebrow">Section 01</div>
-          <h2>Actor Profile</h2>
+<style>
+  /* Key Findings grid */
+  .key-findings {
+    list-style: none;
+    margin: 6px 0 18px;
+    padding: 0;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f5f1e8;
+  }
+  .key-findings li {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 18px;
+    align-items: baseline;
+    margin: 0;
+    padding: 18px 20px;
+    border-left: 3px solid #8a3324;
+    background: #eeeae0;
+  }
+  .key-findings li:not(:last-child) {
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+  .key-findings li strong {
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #1a1a1a;
+    font-weight: 700;
+  }
+  .key-findings li span {
+    color: #2b2b2b;
+    line-height: 1.5;
+  }
+  h3.kf-heading {
+    color: #8a3324;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  @media (max-width: 640px) {
+    .key-findings li {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+  }
+</style>
 
-          <h3>Origin &amp; structure</h3>
-          <ul class="scan-list">
-            <li>Attributed to North Korea's Reconnaissance General Bureau (RGB), active since at least 2009</li>
-            <li>"Lazarus Group" functions as both a broad umbrella term and a label for narrower, related clusters</li>
-            <li>Names like BlueNoroff, Andariel, TraderTraitor, and APT38 are sometimes used interchangeably in public reporting and sometimes track more specific sub-clusters, so attribution should be read carefully against its source and date rather than treated as one uniform actor</li>
-          </ul>
-
-          <h3>Dual mission</h3>
-          <ul class="scan-list">
-            <li>Unlike most state-sponsored APTs, operates with a dual mandate: traditional espionage and disruptive attacks alongside large-scale financially motivated cybercrime</li>
-            <li>Public record spans the 2014 Sony Pictures destructive attack, the attempted Bangladesh Bank SWIFT heist, and the 2017 WannaCry ransomware outbreak</li>
-            <li>Increasingly relies on cryptocurrency theft as a sanctions-evasion mechanism to fund the regime, including its weapons programs</li>
-          </ul>
-
-          <h3>Targeting philosophy</h3>
-          <ul class="scan-list">
-            <li>Cryptocurrency exchanges and DeFi platforms are the current center of gravity, targeted for gaps in cold wallet security or upstream software dependencies</li>
-            <li>A parallel, long-running track targets software developers and IT job seekers through fake recruiting processes, aimed at both credential and cryptocurrency theft and at establishing illicit North Korean remote-worker access to Western companies</li>
-            <li>Defense, aerospace, and South Korean financial, semiconductor, and telecom sectors remain steady secondary targets for espionage</li>
-          </ul>
-        </section>
+<!-- ACTOR PROFILE -->
+<section id="profile">
+  <div class="eyebrow">Section 01</div>
+  <h2>Actor Profile</h2>
+  <h3 class="kf-heading">Key Findings</h3>
+  <ul class="key-findings">
+    <li><strong>Origin</strong><span>Attributed to North Korea's Reconnaissance General Bureau, active since at least 2009; functions as both a broad umbrella and a label for narrower related clusters.</span></li>
+    <li><strong>Primary Target</strong><span>Cryptocurrency exchanges and DeFi platforms, plus software developers and IT job seekers, with defense, aerospace, and South Korean finance/telecom as secondary espionage targets.</span></li>
+    <li><strong>Initial Access</strong><span>Fake job offers and staged interviews (Contagious Interview), compromised upstream software dependencies, and AI-enabled spearphishing including deepfakes.</span></li>
+    <li><strong>Primary Objective</strong><span>Dual mandate of espionage/disruption and financially motivated cybercrime, with cryptocurrency theft increasingly used as a sanctions-evasion funding mechanism.</span></li>
+    <li><strong>Operating Method</strong><span>Delivers credential/wallet stealers and a backdoor via malicious hiring-process packages, then manipulates transaction approvals and rapidly launders proceeds through mixers and chain-hopping.</span></li>
+    <li><strong>Defense Priorities</strong><span>Sandbox code from hiring exercises, require multi-party approval on high-value transactions, audit upstream wallet/custody dependencies, and screen against DPRK-linked wallet designations.</span></li>
+  </ul>
+</section>
 
         <!-- TTPs / KILL CHAIN -->
         <section id="ttps">
