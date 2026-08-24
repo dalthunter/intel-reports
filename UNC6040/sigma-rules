@@ -1,1 +1,177 @@
+# =============================================================================
+# Sigma Detection Rules — UNC6040
+# Salesforce-Focused Vishing & Data Extortion Cluster
+# Author: Dalton Hunter
+# Source: dalthunter/intel-reports — UNC6040
+# =============================================================================
 
+---
+title: Suspicious Data Loader-Style Connected App Authorization
+id: 8f1c1a2e-4b3d-4e7a-9c2f-1a2b3c4d5e01
+status: experimental
+description: Detects authorization of a new connected app in Salesforce resembling the legitimate Data Loader tool, matching UNC6040's initial access vector.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://cloud.google.com/blog/topics/threat-intelligence/unc6040-proactive-hardening-recommendations
+    - https://thehackernews.com/2025/06/google-exposes-vishing-group-unc6040.html
+tags:
+    - attack.initial_access
+    - attack.t1528
+    - attack.t1566.004
+logsource:
+    category: application
+    product: salesforce
+    service: setup_audit_trail
+detection:
+    selection:
+        Action: 'ConnectedApp Authorization'
+        AppName|contains:
+            - 'Data Loader'
+            - 'Dataloader'
+    filter_known_good:
+        AppName: 'Salesforce Data Loader'
+    condition: selection and not filter_known_good
+falsepositives:
+    - Legitimate ISV or admin-approved integration named similarly to Data Loader
+level: high
+
+---
+title: OAuth Device Code Grant Shortly After Unsolicited Support Contact
+id: 8f1c1a2e-4b3d-4e7a-9c2f-1a2b3c4d5e02
+status: experimental
+description: Detects OAuth Device Flow authorization events, which UNC6040 abuses by talking a victim through entering an attacker-supplied device code.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://cloud.google.com/blog/topics/threat-intelligence/technical-analysis-vishing-threats/
+tags:
+    - attack.initial_access
+    - attack.t1528
+    - attack.t1566.004
+logsource:
+    category: application
+    product: salesforce
+    service: login_history
+detection:
+    selection:
+        LoginType: 'OAuth-Device-Flow'
+        Status: 'Success'
+    condition: selection
+falsepositives:
+    - Legitimate device-flow logins from CLI tools, IoT integrations, or CI systems
+level: medium
+
+---
+title: Incremental Bulk Export Resembling Sync Activity from Newly Authorized App
+id: 8f1c1a2e-4b3d-4e7a-9c2f-1a2b3c4d5e03
+status: experimental
+description: Detects a pattern of repeated small-to-moderate volume API/bulk data pulls from a connected app authorized within the prior 24 hours, matching UNC6040's slow exfiltration behavior designed to evade bulk-export alerting.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://cloud.google.com/blog/topics/threat-intelligence/unc6040-proactive-hardening-recommendations
+tags:
+    - attack.exfiltration
+    - attack.collection
+    - attack.t1530
+logsource:
+    category: application
+    product: salesforce
+    service: event_monitoring
+detection:
+    selection:
+        EventType:
+            - 'API'
+            - 'BulkApiRequest'
+            - 'ReportExport'
+    timeframe: 24h
+    condition: selection | count(RequestId) by AppName, UserId > 10
+falsepositives:
+    - Legitimate high-frequency integration or ETL sync recently reauthorized
+level: medium
+
+---
+title: Salesforce Session Activity Originating from Tor Exit Node
+id: 8f1c1a2e-4b3d-4e7a-9c2f-1a2b3c4d5e04
+status: experimental
+description: Detects Salesforce API or login activity sourced from a known Tor exit node IP, matching UNC6040's use of Tor to anonymize follow-on data movement.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://cloud.google.com/blog/topics/threat-intelligence/technical-analysis-vishing-threats/
+tags:
+    - attack.defense_evasion
+    - attack.t1090.003
+logsource:
+    category: application
+    product: salesforce
+    service: login_history
+detection:
+    selection:
+        SourceIp|cidr: TOR_EXIT_NODE_LIST  # populate via threat intel feed at deploy time
+    condition: selection
+falsepositives:
+    - Analyst or researcher testing via Tor
+level: medium
+
+---
+title: Sent Mail Deleted Shortly After Bulk Send From Corporate Mailbox
+id: 8f1c1a2e-4b3d-4e7a-9c2f-1a2b3c4d5e05
+status: experimental
+description: Detects a burst of outbound email followed by deletion from the Sent folder within a short window, matching UNC6040's reported lateral phishing and trail-covering behavior via a compromised mailbox.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://thehackernews.com/2025/06/google-exposes-vishing-group-unc6040.html
+tags:
+    - attack.lateral_movement
+    - attack.defense_evasion
+    - attack.t1566.004
+logsource:
+    category: application
+    product: m365
+    service: exchange
+detection:
+    selection_send:
+        Operation: 'Send'
+    selection_delete:
+        Operation:
+            - 'SoftDelete'
+            - 'HardDelete'
+        Folder: 'Sent Items'
+    timeframe: 30m
+    condition: selection_send | count() by UserId > 15 and selection_delete
+falsepositives:
+    - Legitimate mailbox cleanup or retention policy execution
+level: high
+
+---
+title: Rapid-Deadline Extortion Email Referencing Stolen CRM Data
+id: 8f1c1a2e-4b3d-4e7a-9c2f-1a2b3c4d5e06
+status: experimental
+description: Detects inbound email content consistent with the ShinyHunters/UNC6240 extortion handoff following a UNC6040 intrusion, typically citing a short payment deadline.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://thehackernews.com/2026/01/mandiant-finds-shinyhunters-using.html
+tags:
+    - attack.impact
+    - attack.t1657
+logsource:
+    category: email
+    service: gateway
+detection:
+    selection:
+        Subject|contains:
+            - 'data breach'
+            - 'stolen data'
+            - 'ransom'
+        Body|contains:
+            - '72 hour'
+            - '72-hour'
+            - 'payment deadline'
+    condition: selection
+falsepositives:
+    - Legitimate breach-notification or security vendor correspondence
+level: medium
