@@ -1,1 +1,237 @@
+# =============================================================================
+# Sigma Detection Rules — The Gentlemen
+# aka Storm-2697 (Microsoft)
+# Author: Dalton Hunter
+# Source: dalthunter/intel-reports — The Gentlemen
+# =============================================================================
 
+---
+title: FortiGate Authentication Bypass Exploitation Attempt (CVE-2024-55591)
+id: 3e5f6a7b-8c9d-4e2f-a1b2-4c5d6e7f8a01
+status: experimental
+description: Detects HTTP/HTTPS requests targeting the FortiOS/FortiProxy websocket authentication-bypass flaw used by The Gentlemen as their primary initial access vector.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://nvd.nist.gov/vuln/detail/CVE-2024-55591
+    - https://fortiguard.fortinet.com/threat-actor/6387/the-gentlemen-ransomware
+tags:
+    - attack.initial_access
+    - attack.t1190
+logsource:
+    category: firewall
+    product: fortinet
+detection:
+    selection:
+        uri|contains:
+            - '/jsconsole'
+            - 'ws://'
+        c-uri|contains: '/api/v2/'
+    condition: selection
+falsepositives:
+    - Legitimate FortiGate admin console usage over the same path in edge cases
+level: high
+
+---
+title: Erlang/OTP SSH Remote Code Execution Attempt (CVE-2025-32433)
+id: 3e5f6a7b-8c9d-4e2f-a1b2-4c5d6e7f8a02
+status: experimental
+description: Detects anomalous SSH protocol messages sent prior to authentication, consistent with exploitation of the Erlang/OTP SSH RCE flaw used against exposed management infrastructure.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://nvd.nist.gov/vuln/detail/CVE-2025-32433
+tags:
+    - attack.initial_access
+    - attack.t1190
+logsource:
+    category: application
+    service: ssh
+detection:
+    selection:
+        EventType: 'PreAuthChannelRequest'
+    condition: selection
+falsepositives:
+    - Non-standard SSH clients performing protocol negotiation quirks
+level: high
+
+---
+title: NTLM Reflection Privilege Escalation Attempt (CVE-2025-33073)
+id: 3e5f6a7b-8c9d-4e2f-a1b2-4c5d6e7f8a03
+status: experimental
+description: Detects an NTLM authentication reflected back to the originating host to obtain SYSTEM privileges, consistent with post-compromise privilege escalation reported for The Gentlemen.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://nvd.nist.gov/vuln/detail/CVE-2025-33073
+tags:
+    - attack.privilege_escalation
+    - attack.t1068
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\rundll32.exe'
+        CommandLine|contains:
+            - 'DavSetCookie'
+            - 'WebClient'
+    condition: selection
+falsepositives:
+    - Legitimate WebDAV client activity in rare enterprise configurations
+level: medium
+
+---
+title: Mass Security Log and Forensic Artifact Clearing
+id: 3e5f6a7b-8c9d-4e2f-a1b2-4c5d6e7f8a04
+status: experimental
+description: Detects clearing of Windows event logs, prefetch, or PowerShell history in immediate succession, matching The Gentlemen's pre-encryption anti-forensic cleanup.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.huntress.com/blog/the-gentlemen-ransomware-defense-evasion-ttps
+tags:
+    - attack.defense_evasion
+    - attack.t1070.001
+    - attack.t1070.004
+    - attack.t1070.003
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_wevtutil:
+        Image|endswith: '\wevtutil.exe'
+        CommandLine|contains: 'cl '
+    selection_prefetch:
+        CommandLine|contains: '\Windows\Prefetch'
+        CommandLine|contains:
+            - 'del '
+            - 'Remove-Item'
+    selection_psreadline:
+        CommandLine|contains: 'ConsoleHost_history.txt'
+    condition: selection_wevtutil or selection_prefetch or selection_psreadline
+falsepositives:
+    - Scripted log rotation or IT maintenance jobs
+level: high
+
+---
+title: Shadow Copy Deletion Preceding Ransomware Detonation
+id: 3e5f6a7b-8c9d-4e2f-a1b2-4c5d6e7f8a05
+status: experimental
+description: Detects deletion of volume shadow copies via vssadmin, wmic, or PowerShell, a near-certain precursor to The Gentlemen's encryption stage.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.microsoft.com/en-us/security/blog/2026/05/28/the-gentlemen-ransomware-dissecting-a-self-propagating-go-encryptor/
+tags:
+    - attack.impact
+    - attack.t1490
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_vssadmin:
+        Image|endswith: '\vssadmin.exe'
+        CommandLine|contains: 'delete shadows'
+    selection_wmic:
+        Image|endswith: '\wmic.exe'
+        CommandLine|contains: 'shadowcopy delete'
+    selection_powershell:
+        Image|endswith: '\powershell.exe'
+        CommandLine|contains: 'Get-WmiObject Win32_Shadowcopy'
+    condition: selection_vssadmin or selection_wmic or selection_powershell
+falsepositives:
+    - Legitimate backup software managing shadow copy retention
+level: high
+
+---
+title: Unauthorized Cloudflare Zero Trust Tunnel Registration
+id: 3e5f6a7b-8c9d-4e2f-a1b2-4c5d6e7f8a06
+status: experimental
+description: Detects installation or execution of the Cloudflare tunnel client (cloudflared) outside approved change windows, matching The Gentlemen's use of covert tunnels for staged exfiltration.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.microsoft.com/en-us/security/blog/2026/05/28/the-gentlemen-ransomware-dissecting-a-self-propagating-go-encryptor/
+tags:
+    - attack.exfiltration
+    - attack.t1020
+    - attack.command_and_control
+    - attack.t1090
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\cloudflared.exe'
+        CommandLine|contains: 'tunnel'
+    filter_approved:
+        User|contains: 'APPROVED_ADMIN_ACCOUNTS'  # populate with authorized change-control accounts
+    condition: selection and not filter_approved
+falsepositives:
+    - Sanctioned Cloudflare Zero Trust deployment by IT/network team
+level: high
+
+---
+title: GPO Modification Followed by Domain-Wide Binary Push
+id: 3e5f6a7b-8c9d-4e2f-a1b2-4c5d6e7f8a07
+status: experimental
+description: Detects a Group Policy Object modification closely followed by new executable creation across multiple domain-joined hosts, consistent with The Gentlemen's domain-wide GPO-based encryptor propagation.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.microsoft.com/en-us/security/blog/2026/05/28/the-gentlemen-ransomware-dissecting-a-self-propagating-go-encryptor/
+tags:
+    - attack.lateral_movement
+    - attack.t1484.001
+    - attack.impact
+    - attack.t1486
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_gpo:
+        Image|endswith:
+            - '\gpscript.exe'
+            - '\gpupdate.exe'
+    selection_ad_change:
+        EventID: 5136
+        ObjectClass: 'groupPolicyContainer'
+    timeframe: 1h
+    condition: selection_gpo and selection_ad_change
+falsepositives:
+    - Legitimate scheduled GPO software deployment
+level: high
+
+---
+title: Native CLI Active Directory Enumeration Ahead of Deployment
+id: 3e5f6a7b-8c9d-4e2f-a1b2-4c5d6e7f8a08
+status: experimental
+description: Detects use of built-in Windows tools (net, nltest, dsquery, PowerShell AD module) to enumerate privileged accounts and domain structure, matching The Gentlemen's living-off-the-land reconnaissance ahead of ransomware deployment.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://redpiranha.net/news/the-gentlemen-ransomware-analysis
+tags:
+    - attack.discovery
+    - attack.t1087.002
+    - attack.t1018
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith:
+            - '\net.exe'
+            - '\net1.exe'
+            - '\nltest.exe'
+            - '\dsquery.exe'
+    CommandLine|contains:
+        - 'group'
+        - 'domain_admins'
+        - '/domain_trusts'
+        - 'Get-ADUser'
+    condition: selection
+falsepositives:
+    - Routine administrative enumeration by IT/helpdesk staff
+level: low
