@@ -207,7 +207,7 @@ A complete, kill-chain-ordered reference of attacker commands mapped to MITRE AT
 
 ## 11. Quick-Reference Lists
 
-**Top 10 commands to know cold for a SOC/CTI interview:**
+**Top 10 common commands**
 `whoami` · `net user /domain` · `vssadmin delete shadows` · `rundll32.exe comsvcs.dll,MiniDump` · `mimikatz lsadump::dcsync` · `wevtutil cl Security` · `powershell -enc` · `net use \\target\c$` · `wmic process call create` · `Rubeus.exe kerberoast`
 
 **Top 5 for Active Directory-focused roles:**
@@ -220,18 +220,3 @@ A complete, kill-chain-ordered reference of attacker commands mapped to MITRE AT
 `vssadmin delete shadows` (T1490) · DCSync from a non-DC account (T1003.006) · a sudden local data-staging burst (T1074.001)
 
 ---
-
-## 12. 30-Day Study Plan
-
-| Week | Focus | Goal |
-|---|---|---|
-| 1 | Sections 1 (Top 25) + 6 (Discovery) | Recognize every discovery command and explain what an attacker learns from it |
-| 2 | Sections 2 (Persistence) + 5 (Defense Evasion) | Explain how a technique survives reboot and how it hides from a defender |
-| 3 | Sections 3 (Credential Access) + 9 (Active Directory) | Trace the DCSync → Golden Ticket chain end to end from memory |
-| 4 | Sections 4 (Lateral Movement) + 7 (Impact) + 8 (PowerShell) + 10 (Exfiltration) | Pick one of your 9 threat actor reports and map its full kill chain to specific rows in this document |
-
-**Daily structure (1-2 hrs):** 20 min reading one section's table → 20 min looking up the linked ATT&CK page for 2-3 unfamiliar rows → 20-40 min hands-on (run the safe/native commands on a test VM, check what log event they produce) → 10 min writing one sentence connecting today's material to one of your 9 reports.
-
----
-
-*Built from 10 verified phases. Every ATT&CK ID links directly to attack.mitre.org. Companion piece to the 9 threat actor reports and Sigma rules at [dalthunter/intel-reports](https://github.com/dalthunter/intel-reports).*
