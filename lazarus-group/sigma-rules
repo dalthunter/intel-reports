@@ -1,1 +1,235 @@
+# =============================================================================
+# Sigma Detection Rules — Lazarus Group
+# aka Hidden Cobra / APT38 / Diamond Sleet / TraderTraitor / BlueNoroff
+# Author: Dalton Hunter
+# Source: dalthunter/intel-reports — Lazarus Group
+# =============================================================================
 
+---
+title: Suspicious NPM/PyPI Package Install During Interview or Take-Home Test Context
+id: 4f6a7b8c-9d1e-4f3a-b2c3-5d6e7f8a9b01
+status: experimental
+description: Detects package manager installs from a developer directory named in a way consistent with a coding-challenge or interview repository, matching Lazarus's Contagious Interview delivery vector for BeaverTail/InvisibleFerret.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://attack.mitre.org/groups/G0032/
+tags:
+    - attack.initial_access
+    - attack.t1195.002
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_pm:
+        Image|endswith:
+            - '\npm.cmd'
+            - '\npm.exe'
+            - '\yarn.cmd'
+            - '\pip.exe'
+    selection_context:
+        CurrentDirectory|contains:
+            - 'interview'
+            - 'coding-test'
+            - 'take-home'
+            - 'skill-test'
+            - 'assessment'
+    condition: selection_pm and selection_context
+falsepositives:
+    - Legitimate internal hiring-assessment tooling built and vetted in-house
+level: medium
+
+---
+title: BeaverTail JavaScript Stealer Process Pattern
+id: 4f6a7b8c-9d1e-4f3a-b2c3-5d6e7f8a9b02
+status: experimental
+description: Detects Node.js execution of a script accessing browser credential stores or cryptocurrency wallet extension data paths, consistent with reported BeaverTail behavior.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://cyble.com/threat-actor-profiles/lazarus-group/
+tags:
+    - attack.credential_access
+    - attack.t1555.003
+    - attack.collection
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_node:
+        Image|endswith: '\node.exe'
+    selection_target:
+        CommandLine|contains:
+            - 'Login Data'
+            - 'Local Extension Settings'
+            - 'wallet.dat'
+            - 'MetaMask'
+    condition: selection_node and selection_target
+falsepositives:
+    - Legitimate browser-automation or password-migration tooling
+level: high
+
+---
+title: InvisibleFerret Python Backdoor In-Memory Execution
+id: 4f6a7b8c-9d1e-4f3a-b2c3-5d6e7f8a9b03
+status: experimental
+description: Detects a Python process spawned with an inline command performing outbound network connections shortly after a suspicious package install, consistent with InvisibleFerret's deployment alongside BeaverTail.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://deepstrike.io/blog/lazarus-group
+tags:
+    - attack.persistence
+    - attack.command_and_control
+    - attack.t1059.006
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith:
+            - '\python.exe'
+            - '\pythonw.exe'
+        ParentImage|endswith:
+            - '\node.exe'
+            - '\cmd.exe'
+    CommandLine|contains: '-c'
+    condition: selection
+falsepositives:
+    - Legitimate mixed Node/Python developer tooling
+level: medium
+
+---
+title: Nested Multi-Layer Script Obfuscation Execution
+id: 4f6a7b8c-9d1e-4f3a-b2c3-5d6e7f8a9b04
+status: experimental
+description: Detects PowerShell or script execution with multiple chained encoding/decoding layers, consistent with Lazarus's reported Matryoshka-style nested obfuscation used to evade signature-based tooling.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.group-ib.com/masked-actors/lazarus/
+tags:
+    - attack.defense_evasion
+    - attack.t1027
+    - attack.t1140
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\powershell.exe'
+        CommandLine|contains|all:
+            - '-EncodedCommand'
+    selection_nested:
+        CommandLine|contains:
+            - 'FromBase64String'
+            - 'IEX'
+    condition: selection and selection_nested
+falsepositives:
+    - Legitimate admin scripts using encoded commands for special characters, though nested decode chains are uncommon
+level: high
+
+---
+title: SSL-Wrapped Secondary Encryption in Outbound C2 Traffic Pattern
+id: 4f6a7b8c-9d1e-4f3a-b2c3-5d6e7f8a9b05
+status: experimental
+description: Detects TLS sessions carrying a payload with high entropy inconsistent with typical HTTP/JSON content, consistent with Lazarus layering additional encryption inside an already-encrypted SSL tunnel.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://attack.mitre.org/techniques/T1071/
+tags:
+    - attack.command_and_control
+    - attack.t1071
+    - attack.t1573
+logsource:
+    category: proxy
+detection:
+    selection:
+        c-uri|contains: 'https://'
+    high_entropy_body: HIGH_ENTROPY_PAYLOAD_FLAG  # populate from proxy/IDS entropy scoring feature
+    condition: selection and high_entropy_body
+falsepositives:
+    - Legitimate encrypted-within-encrypted traffic such as VPN-over-HTTPS or certain backup tools
+level: low
+
+---
+title: New Scheduled Task or Service Created Following Unvetted Package Execution
+id: 4f6a7b8c-9d1e-4f3a-b2c3-5d6e7f8a9b06
+status: experimental
+description: Detects scheduled task or Windows service creation occurring shortly after execution of an npm/pip package or downloaded interview-related script, matching Lazarus's preference for standard, low-visibility persistence mechanisms.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://cyfirma.com/research/apt-profile-lazarus-group/
+tags:
+    - attack.persistence
+    - attack.t1053.005
+    - attack.t1543.003
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_schtasks:
+        Image|endswith: '\schtasks.exe'
+        CommandLine|contains: '/create'
+    selection_sc:
+        Image|endswith: '\sc.exe'
+        CommandLine|contains: 'create'
+    timeframe: 1h
+    condition: selection_schtasks or selection_sc
+falsepositives:
+    - Legitimate software installers creating scheduled tasks or services
+level: low
+
+---
+title: Anomalous Multi-Signature Wallet Approval Request
+id: 4f6a7b8c-9d1e-4f3a-b2c3-5d6e7f8a9b07
+status: experimental
+description: Detects a multi-signature wallet transaction approval request originating from an unrecognized signer session or outside normal approval hours, consistent with Lazarus's transaction-manipulation approach to draining exchange or DeFi platform funds.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.sanctions.io/blog/the-lazarus-group-and-dprk-crypto-theft-in-2026
+tags:
+    - attack.impact
+    - attack.t1565
+logsource:
+    category: application
+    service: custody_platform
+detection:
+    selection:
+        EventType: 'MultiSigApprovalRequest'
+    filter_known_signer:
+        SignerSessionId|contains: 'KNOWN_SIGNER_SESSION_LIST'  # populate with registered/approved signer sessions
+    condition: selection and not filter_known_signer
+falsepositives:
+    - New authorized signer onboarded without updating the known-session list
+level: high
+
+---
+title: Rapid Post-Transfer Chain-Hopping or Mixer Interaction
+id: 4f6a7b8c-9d1e-4f3a-b2c3-5d6e7f8a9b08
+status: experimental
+description: Detects a large outbound cryptocurrency transfer followed within a short window by interaction with a known mixing service or cross-chain bridge, consistent with Lazarus's rapid post-theft laundering pattern.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://deepstrike.io/blog/lazarus-group
+tags:
+    - attack.exfiltration
+    - attack.t1020
+logsource:
+    category: application
+    service: blockchain_monitoring
+detection:
+    selection_large_transfer:
+        EventType: 'Withdrawal'
+        AmountUsd|gt: 100000
+    selection_mixer:
+        DestinationAddress|contains: 'KNOWN_MIXER_BRIDGE_ADDRESS_LIST'  # populate from current chain-analysis feed
+    timeframe: 1h
+    condition: selection_large_transfer and selection_mixer
+falsepositives:
+    - Legitimate large customer withdrawal that independently routes through a bridge for unrelated reasons
+level: high
