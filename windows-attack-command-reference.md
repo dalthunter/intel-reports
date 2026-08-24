@@ -22,8 +22,6 @@ A complete, kill-chain-ordered reference of attacker commands mapped to MITRE AT
 
 ## 1. Foundations — Top 25
 
-The essential commands to learn first — one from nearly every phase of a real intrusion.
-
 | # | Command | What It Does | Why Attacker Uses It | ATT&CK ID | ATT&CK Technique | Evidence / Telemetry | Category |
 |---|---|---|---|---|---|---|---|
 | 1 | `whoami` | Shows the current logged-in user | Confirms which account they're running as | [T1033](https://attack.mitre.org/techniques/T1033/) | System Owner/User Discovery | Security 4688, Sysmon Event ID 1 | Discovery |
