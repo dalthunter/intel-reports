@@ -1,1 +1,229 @@
+# =============================================================================
+# Sigma Detection Rules — FIN7
+# aka Carbon Spider / GOLD NIAGARA / ITG14 / Sangria Tempest
+# Author: Dalton Hunter
+# Source: dalthunter/intel-reports — FIN7
+# =============================================================================
 
+---
+title: MSIX Installer Execution from Malvertising or Fake Download Page
+id: 2d4e5f6a-7b8c-4d1e-9f2a-3b4c5d6e7f01
+status: experimental
+description: Detects execution of an MSIX installer shortly after a browser download event, matching FIN7's malvertising and fake software download page delivery vector (e.g. spoofed 7-Zip or browser update sites).
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.recordedfuture.com/research/grayalpha-uses-diverse-infection-vectors-deploy-powernet-loader-netsupport-rat
+tags:
+    - attack.initial_access
+    - attack.t1566
+    - attack.execution
+    - attack.t1204.002
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\AppInstaller.exe'
+        CommandLine|contains: '.msix'
+    parent_browser:
+        ParentImage|endswith:
+            - '\chrome.exe'
+            - '\msedge.exe'
+            - '\firefox.exe'
+    condition: selection and parent_browser
+falsepositives:
+    - Legitimate MSIX-packaged software installed via approved enterprise channels
+level: medium
+
+---
+title: BadUSB-Style Device Enumeration Followed by Rapid Process Execution
+id: 2d4e5f6a-7b8c-4d1e-9f2a-3b4c5d6e7f02
+status: experimental
+description: Detects a new HID/removable storage device enumeration immediately followed by process execution from a removable drive path, consistent with FIN7's mailed malicious USB delivery method.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.huntress.com/threat-library/threat-actors/fin7
+tags:
+    - attack.initial_access
+    - attack.t1091
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|contains: ':\\'
+        CommandLine|re: '^[D-Z]:\\\\.*\.exe'
+    timeframe: 2m
+    condition: selection
+falsepositives:
+    - Legitimate use of approved USB drives for file transfer or provisioning
+level: low
+
+---
+title: NetSupport RAT Process or Network Beacon on Unmanaged Endpoint
+id: 2d4e5f6a-7b8c-4d1e-9f2a-3b4c5d6e7f03
+status: experimental
+description: Detects execution of NetSupport Manager client binaries or associated network beaconing where the tool is not an approved remote-access solution, matching FIN7's repurposing of the commercial RAT as its primary payload.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.sentinelone.com/labs/fin7-reboot-cybercrime-gang-enhances-ops-with-new-edr-bypasses-and-automated-attacks/
+tags:
+    - attack.command_and_control
+    - attack.t1219
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_image:
+        Image|endswith:
+            - '\client32.exe'
+            - '\remcmdstub.exe'
+    selection_path_excl:
+        Image|contains: '\Program Files\NetSupport\'
+    condition: selection_image and not selection_path_excl
+falsepositives:
+    - IT help desk legitimately using NetSupport Manager from its approved install path
+level: high
+
+---
+title: EDR/AV Service Tampering or Unexpected Termination
+id: 2d4e5f6a-7b8c-4d1e-9f2a-3b4c5d6e7f04
+status: experimental
+description: Detects endpoint security services being stopped, disabled, or crashing unexpectedly, consistent with FIN7's AvNeutralizer (AuKill) EDR impairment tool.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.sentinelone.com/labs/fin7-reboot-cybercrime-gang-enhances-ops-with-new-edr-bypasses-and-automated-attacks/
+tags:
+    - attack.defense_evasion
+    - attack.t1562.001
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_sc:
+        Image|endswith: '\sc.exe'
+        CommandLine|contains:
+            - 'stop'
+            - 'config'
+        CommandLine|contains|all:
+            - 'sc'
+    selection_service_names:
+        CommandLine|contains:
+            - 'WinDefend'
+            - 'SepMasterService'
+            - 'Sense'
+            - 'CSFalconService'
+            - 'elastic-endpoint'
+    condition: selection_sc and selection_service_names
+falsepositives:
+    - Authorized administrator performing planned EDR migration or maintenance
+level: high
+
+---
+title: Application Compatibility Shim Database Installed for Persistence
+id: 2d4e5f6a-7b8c-4d1e-9f2a-3b4c5d6e7f05
+status: experimental
+description: Detects installation of a custom application compatibility shim database (.sdb), a low-visibility persistence technique reported in FIN7 intrusions.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://attack.mitre.org/groups/G0046/
+tags:
+    - attack.persistence
+    - attack.t1546.011
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\sdbinst.exe'
+        CommandLine|contains: '.sdb'
+    condition: selection
+falsepositives:
+    - Legitimate application compatibility fixes deployed by IT
+level: medium
+
+---
+title: Anubis Backdoor In-Memory Python Execution with Base64 C2
+id: 2d4e5f6a-7b8c-4d1e-9f2a-3b4c5d6e7f06
+status: experimental
+description: Detects a Python interpreter executing in-memory code with Base64-encoded command line content, consistent with reported behavior of the FIN7 Anubis backdoor.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://thehackernews.com/2025/06/anubis-ransomware-encrypts-and-wipes.html
+tags:
+    - attack.command_and_control
+    - attack.t1071
+    - attack.execution
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_python:
+        Image|endswith:
+            - '\python.exe'
+            - '\pythonw.exe'
+    selection_encoded:
+        CommandLine|contains:
+            - '-c'
+            - 'base64'
+            - 'b64decode'
+    condition: selection_python and selection_encoded
+falsepositives:
+    - Legitimate internal Python tooling using Base64 encoding for unrelated purposes
+level: medium
+
+---
+title: Ransomware Encryptor with Destructive Wipe Behavior
+id: 2d4e5f6a-7b8c-4d1e-9f2a-3b4c5d6e7f07
+status: experimental
+description: Detects mass file rename/overwrite activity combined with volume shadow copy deletion, consistent with FIN7-affiliated ransomware strains (e.g. Anubis) that include a destructive wipe mode.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://thehackernews.com/2025/06/anubis-ransomware-encrypts-and-wipes.html
+tags:
+    - attack.impact
+    - attack.t1486
+    - attack.t1490
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_vss:
+        Image|endswith: '\vssadmin.exe'
+        CommandLine|contains: 'delete shadows'
+    selection_wmic:
+        Image|endswith: '\wmic.exe'
+        CommandLine|contains: 'shadowcopy delete'
+    condition: selection_vss or selection_wmic
+falsepositives:
+    - Legitimate backup software or admin-initiated shadow copy cleanup
+level: high
+
+---
+title: Traffic to Known TAG-124 Style Traffic Distribution Infrastructure
+id: 2d4e5f6a-7b8c-4d1e-9f2a-3b4c5d6e7f08
+status: experimental
+description: Detects outbound web requests to domains matching TAG-124-style traffic distribution system infrastructure used to redirect victims toward FIN7's fake update or download pages.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.recordedfuture.com/research/grayalpha-uses-diverse-infection-vectors-deploy-powernet-loader-netsupport-rat
+tags:
+    - attack.command_and_control
+    - attack.t1071.001
+logsource:
+    category: proxy
+detection:
+    selection:
+        c-uri|contains: TAG124_TDS_DOMAIN_LIST  # populate via current threat intel feed at deploy time
+    condition: selection
+falsepositives:
+    - None expected; verify domain list currency before enabling as high severity
+level: medium
