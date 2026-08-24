@@ -1,1 +1,229 @@
+# =============================================================================
+# Sigma Detection Rules — Scattered Spider
+# aka UNC3944 / Octo Tempest / 0ktapus / Muddled Libra / Storm-0875
+# Author: Dalton Hunter
+# Source: dalthunter/intel-reports — Scattered Spider
+# =============================================================================
 
+---
+title: New MFA Device Registered Shortly After Help Desk Password Reset
+id: 6b8c9d1e-2f3a-4b5c-d4e5-7f8a9b0c1d01
+status: experimental
+description: Detects a new MFA device or authenticator enrollment occurring within a short window of a password reset, a leading indicator of an in-progress account takeover via Scattered Spider's help desk impersonation vector.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-320a
+    - https://www.huntress.com/threat-library/threat-actors/scattered-spider
+tags:
+    - attack.initial_access
+    - attack.t1656
+    - attack.persistence
+    - attack.t1098.005
+logsource:
+    category: application
+    service: azuread
+detection:
+    selection_reset:
+        OperationName: 'Reset password (self-service or admin)'
+    selection_mfa_enroll:
+        OperationName:
+            - 'User registered security info'
+            - 'Add registered owner to device'
+    timeframe: 1h
+    condition: selection_reset and selection_mfa_enroll
+falsepositives:
+    - Legitimate password reset and device re-enrollment during normal employee onboarding or device replacement
+level: high
+
+---
+title: MFA Push Bombing - Repeated Authentication Prompts in Short Window
+id: 6b8c9d1e-2f3a-4b5c-d4e5-7f8a9b0c1d02
+status: experimental
+description: Detects multiple MFA push notification failures or denials followed by an eventual approval for the same user within a short timeframe, consistent with Scattered Spider's push-bombing technique.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://attack.mitre.org/techniques/T1621/
+tags:
+    - attack.credential_access
+    - attack.t1621
+logsource:
+    category: application
+    service: azuread
+detection:
+    selection_denied:
+        ResultType: 'MFADenied'
+    selection_approved:
+        ResultType: 'Success'
+        AuthMethod: 'MobileAppNotification'
+    timeframe: 15m
+    condition: selection_denied | count() by UserPrincipalName > 3 and selection_approved
+falsepositives:
+    - User experiencing genuine connectivity issues before successfully approving their own login
+level: high
+
+---
+title: Signed Vulnerable Driver Loaded for EDR Impairment (BYOVD)
+id: 6b8c9d1e-2f3a-4b5c-d4e5-7f8a9b0c1d03
+status: experimental
+description: Detects loading of a signed but known-vulnerable kernel driver, matching Scattered Spider's Bring Your Own Vulnerable Driver technique used to disable EDR/AV at the kernel level.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.huntress.com/threat-library/threat-actors/scattered-spider
+tags:
+    - attack.defense_evasion
+    - attack.t1068
+    - attack.t1562.001
+logsource:
+    category: driver_load
+    product: windows
+detection:
+    selection:
+        ImageLoaded|contains: 'KNOWN_VULNERABLE_DRIVER_HASH_LIST'  # populate from LOLDrivers or equivalent current feed
+    condition: selection
+falsepositives:
+    - Legitimate hardware vendor driver that happens to appear on a vulnerable-driver list but is pinned/patched
+level: high
+
+---
+title: Cloud Identity Provider Enumeration Ahead of Privilege Escalation
+id: 6b8c9d1e-2f3a-4b5c-d4e5-7f8a9b0c1d04
+status: experimental
+description: Detects bulk enumeration of users, roles, and admin groups across Okta, Azure AD, or AWS IAM within a short window from a single session, consistent with Scattered Spider's cloud/identity mapping stage.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://attack.mitre.org/techniques/T1526/
+tags:
+    - attack.discovery
+    - attack.t1526
+    - attack.t1087.004
+logsource:
+    category: application
+    service: cloud_audit
+detection:
+    selection:
+        EventName:
+            - 'ListUsers'
+            - 'ListRoles'
+            - 'ListGroups'
+            - 'ListAdmins'
+            - 'GetAccountSummary'
+    condition: selection | count() by SourceIp, ActorId > 30
+falsepositives:
+    - Legitimate security or IAM tooling performing a scheduled access review
+level: medium
+
+---
+title: Unusual Okta or Azure AD Privileged Role Grant Following Help Desk Activity
+id: 6b8c9d1e-2f3a-4b5c-d4e5-7f8a9b0c1d05
+status: experimental
+description: Detects a privileged role assignment (Global Administrator, Super Admin) granted to an account that recently underwent a password reset or new device registration, consistent with escalation following a successful help desk impersonation call.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.huntress.com/threat-library/threat-actors/scattered-spider
+tags:
+    - attack.privilege_escalation
+    - attack.t1098
+logsource:
+    category: application
+    service: azuread
+detection:
+    selection_role_grant:
+        OperationName: 'Add member to role'
+        ModifiedRole|contains:
+            - 'Global Administrator'
+            - 'Privileged Role Administrator'
+    selection_recent_reset:
+        OperationName: 'Reset password (self-service or admin)'
+    timeframe: 4h
+    condition: selection_role_grant and selection_recent_reset
+falsepositives:
+    - Planned privileged onboarding that coincidentally follows a legitimate password reset
+level: high
+
+---
+title: Unapproved Remote Access Tool Installed Post-Authentication
+id: 6b8c9d1e-2f3a-4b5c-d4e5-7f8a9b0c1d06
+status: experimental
+description: Detects installation of AnyDesk, TeamViewer, or similar remote access software on a host shortly after a new or recently reset account authenticates, matching Scattered Spider's use of trusted tools for persistence.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://attack.mitre.org/techniques/T1219/
+tags:
+    - attack.persistence
+    - attack.t1219
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith:
+            - '\AnyDesk.exe'
+            - '\TeamViewer.exe'
+            - '\ScreenConnect.exe'
+    filter_approved:
+        Image|startswith: 'C:\Program Files\ApprovedRMM\'  # replace with organization's sanctioned install path
+    condition: selection and not filter_approved
+falsepositives:
+    - Legitimate IT support session using an approved but freshly-installed remote tool
+level: medium
+
+---
+title: Bulk Query of SaaS or Cloud Storage Ahead of Suspected Extortion
+id: 6b8c9d1e-2f3a-4b5c-d4e5-7f8a9b0c1d07
+status: experimental
+description: Detects high-volume read or export activity against SaaS platforms and cloud storage buckets from a single session, consistent with Scattered Spider's collection stage prior to double-extortion encryption.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://attack.mitre.org/techniques/T1530/
+tags:
+    - attack.collection
+    - attack.t1530
+    - attack.exfiltration
+logsource:
+    category: application
+    service: cloud_audit
+detection:
+    selection:
+        EventName:
+            - 'GetObject'
+            - 'DownloadFile'
+            - 'ExportReport'
+    condition: selection | count() by ActorId > 100
+falsepositives:
+    - Legitimate bulk data migration or scheduled reporting job
+level: medium
+
+---
+title: Direct ESXi Hypervisor Encryption or Mass VM Shutdown
+id: 6b8c9d1e-2f3a-4b5c-d4e5-7f8a9b0c1d08
+status: experimental
+description: Detects mass datastore file modification or a burst of VM power-off operations issued from vCenter/ESXi management, consistent with Scattered Spider encrypting the hypervisor layer directly to take down every hosted VM at once.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://attack.mitre.org/techniques/T1486/
+tags:
+    - attack.impact
+    - attack.t1486
+logsource:
+    category: application
+    service: vmware_vcenter
+detection:
+    selection_poweroff:
+        EventType: 'VmPoweredOffEvent'
+    selection_datastore_write:
+        EventType: 'DatastoreFileCopiedEvent'
+        FileExtension|contains:
+            - '.vmdk'
+            - '.vmx'
+    condition: (selection_poweroff | count() by SourceIp > 10) or selection_datastore_write
+falsepositives:
+    - Legitimate planned maintenance window with scripted mass VM shutdown
+level: critical
