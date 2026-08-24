@@ -1,1 +1,186 @@
+# =============================================================================
+# Sigma Detection Rules — Luna Moth
+# aka Silent Ransom Group (SRG) / Chatty Spider / UNC3753
+# Author: Dalton Hunter
+# Source: dalthunter/intel-reports — Luna Moth
+# =============================================================================
 
+---
+title: RMM Tool Installed Outside Managed Deployment Process
+id: 5a7b8c9d-1e2f-4a4b-c3d4-6e7f8a9b0c01
+status: experimental
+description: Detects installation of a legitimate remote monitoring and management tool from a non-standard source or by a non-IT user session, matching Luna Moth's core tradecraft of talking victims into installing trusted RMM software themselves.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.fbi.gov/file-repository/cyber-alerts/silent-ransom-group-targeting-law-firms-052325.pdf/view
+tags:
+    - attack.execution
+    - attack.persistence
+    - attack.t1219
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_rmm:
+        Image|endswith:
+            - '\AnyDesk.exe'
+            - '\TeamViewer.exe'
+            - '\ScreenConnect.exe'
+            - '\Zoho_Assist.exe'
+            - '\Splashtop.exe'
+            - '\LogMeIn.exe'
+            - '\Atera.exe'
+    filter_approved_path:
+        Image|startswith: 'C:\Program Files\ApprovedRMM\'  # replace with organization's sanctioned install path
+    filter_it_group:
+        User|contains: 'IT_HELPDESK_GROUP'  # populate with approved IT admin accounts
+    condition: selection_rmm and not filter_approved_path and not filter_it_group
+falsepositives:
+    - IT staff installing an approved RMM tool from a personal profile during onboarding
+level: high
+
+---
+title: RMM Session Established Shortly After Inbound Call or Callback Email Click
+id: 5a7b8c9d-1e2f-4a4b-c3d4-6e7f8a9b0c02
+status: experimental
+description: Detects a remote-access tool session beginning within a short window of an employee clicking a link in a fake invoice/dispute email, consistent with Luna Moth's original BazarCall-style callback phishing lure.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://malpedia.caad.fkie.fraunhofer.de/actor/luna_moth
+tags:
+    - attack.initial_access
+    - attack.t1566
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_mail_click:
+        Image|endswith:
+            - '\outlook.exe'
+            - '\chrome.exe'
+            - '\msedge.exe'
+        CommandLine|contains:
+            - 'invoice'
+            - 'dispute'
+            - 'subscription'
+    selection_rmm_start:
+        Image|endswith:
+            - '\AnyDesk.exe'
+            - '\TeamViewer.exe'
+            - '\ScreenConnect.exe'
+    timeframe: 30m
+    condition: selection_mail_click and selection_rmm_start
+falsepositives:
+    - Coincidental timing between unrelated email activity and legitimate remote support session
+level: medium
+
+---
+title: New Removable Storage Device Inserted on Sensitive Data Workstation
+id: 5a7b8c9d-1e2f-4a4b-c3d4-6e7f8a9b0c03
+status: experimental
+description: Detects a new USB mass storage device enumeration on a workstation with access to client files or case data, matching Luna Moth's reported on-site tactic of physically planting a USB device to copy data directly.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.ic3.gov/CSA/2026/260526.pdf
+tags:
+    - attack.collection
+    - attack.t1052.001
+logsource:
+    category: driver_load
+    product: windows
+detection:
+    selection:
+        EventID: 2003
+        ClassName: 'DiskDrive'
+    filter_sensitive_hosts:
+        Computer|contains: 'SENSITIVE_DATA_HOSTGROUP'  # populate with workstations tied to legal/client file shares
+    condition: selection and filter_sensitive_hosts
+falsepositives:
+    - Authorized IT staff performing scheduled data backup or migration via USB
+level: medium
+
+---
+title: Unscheduled Physical IT Visit Not Matched to a Work Order
+id: 5a7b8c9d-1e2f-4a4b-c3d4-6e7f8a9b0c04
+status: experimental
+description: Detects a visitor log entry for IT support that lacks a corresponding open or scheduled ticket, matching Luna Moth's reported on-site impersonation of IT personnel since late 2025. Intended for correlation with a physical access control or visitor management system feeding logs into the SIEM.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.halcyon.ai/ransomware-alerts/an-old-tactic-returns-silent-ransom-groups-active-use-of-physical-intrusion-against-u-s-law-firms
+tags:
+    - attack.initial_access
+    - attack.t1078
+logsource:
+    category: application
+    service: physical_access_control
+detection:
+    selection:
+        VisitorPurpose|contains:
+            - 'IT support'
+            - 'IT maintenance'
+            - 'technician'
+    filter_open_ticket:
+        TicketId|exists: true
+    condition: selection and not filter_open_ticket
+falsepositives:
+    - Ticket system outage or delayed ticket creation for a legitimate visit
+level: high
+
+---
+title: Large Outbound Transfer to Unfamiliar Cloud Storage Endpoint
+id: 5a7b8c9d-1e2f-4a4b-c3d4-6e7f8a9b0c05
+status: experimental
+description: Detects a high-volume outbound transfer from an endpoint with access to sensitive file shares to a cloud storage domain not on the organization's approved list, matching Luna Moth's exfiltration-only playbook conducted through the same remote-access session used at initial access.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.s-rminform.com/latest-thinking/ransomware-in-focus-luna-moth
+tags:
+    - attack.exfiltration
+    - attack.t1567.002
+logsource:
+    category: proxy
+detection:
+    selection:
+        c-uri|contains:
+            - 'mega.nz'
+            - 'mediafire.com'
+            - 'wetransfer.com'
+            - 'gofile.io'
+    filter_approved:
+        c-uri|contains: 'APPROVED_CLOUD_STORAGE_DOMAINS'  # populate with sanctioned corporate cloud storage
+    condition: selection and not filter_approved
+falsepositives:
+    - Legitimate one-off use of a personal file-sharing service by an employee
+level: medium
+
+---
+title: Sensitive File Share Enumeration Without Broader Network Discovery
+id: 5a7b8c9d-1e2f-4a4b-c3d4-6e7f8a9b0c06
+status: experimental
+description: Detects rapid, targeted access to client-file or case-document shares from a session that shows no preceding broad network or AD enumeration, consistent with Luna Moth's discovery pattern of going straight for high-value data rather than mapping the environment.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.surefirecyber.com/threat-actor-deep-dive-silent/
+tags:
+    - attack.discovery
+    - attack.collection
+    - attack.t1083
+logsource:
+    category: file_event
+    product: windows
+detection:
+    selection:
+        TargetFilename|contains:
+            - '\Client Files\'
+            - '\Case Documents\'
+            - '\Legal\'
+    condition: selection | count() by SourceIp > 50
+falsepositives:
+    - Legitimate paralegal or attorney bulk file review during case preparation
+level: low
