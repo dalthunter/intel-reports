@@ -1,1 +1,226 @@
+# =============================================================================
+# Sigma Detection Rules — TraderTraitor
+# aka Jade Sleet (Microsoft) / UNC4899 (Mandiant) / Slow Pisces / Lazarus subgroup
+# Author: Dalton Hunter
+# Source: dalthunter/intel-reports — TraderTraitor
+# =============================================================================
 
+---
+title: Trojanized Electron/Node.js Crypto Application Execution
+id: 8d1e2f3a-4b5c-4d7e-f6a7-9b0c1d2e3f01
+status: experimental
+description: Detects execution of an Electron/Node.js packaged application from a non-standard install path shortly after download, matching TraderTraitor's distribution of trojanized cryptocurrency trading or wallet applications.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.wiz.io/blog/north-korean-tradertraitor-crypto-heist
+    - https://www.cisa.gov/news-events/cybersecurity-advisories/aa22-108a
+tags:
+    - attack.initial_access
+    - attack.t1566
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_electron:
+        Image|endswith: '\electron.exe'
+    selection_download_path:
+        Image|contains:
+            - '\Downloads\'
+            - '\Temp\'
+    condition: selection_electron and selection_download_path
+falsepositives:
+    - Legitimate Electron application installed directly from a download folder before relocation
+level: medium
+
+---
+title: Recruiter-Themed PDF or Coding-Test Script Executed by Developer
+id: 8d1e2f3a-4b5c-4d7e-f6a7-9b0c1d2e3f02
+status: experimental
+description: Detects a Python script or PDF reader spawning a child process shortly after opening a file with a job-offer or coding-test related name, matching TraderTraitor's LinkedIn recruiter lure delivery pattern.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.invictus-ir.com/news/profiling-tradetraitor-tactics-history-defenses
+tags:
+    - attack.initial_access
+    - attack.t1566.001
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_lure_name:
+        Image|endswith:
+            - '\python.exe'
+            - '\AcroRd32.exe'
+    ParentCommandLine|contains:
+        - 'coding_test'
+        - 'coding-challenge'
+        - 'job_offer'
+        - 'interview_task'
+    condition: selection_lure_name
+falsepositives:
+    - Legitimate internally-authored coding assessment named similarly
+level: medium
+
+---
+title: New IAM User, Role, or Access Key Created Outside CI/CD Pipeline
+id: 8d1e2f3a-4b5c-4d7e-f6a7-9b0c1d2e3f03
+status: experimental
+description: Detects creation of a new IAM user, role, or access key by a principal not associated with an approved automation/CI-CD identity, matching TraderTraitor's persistence technique observed in the Bybit intrusion.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.sygnia.co/blog/sygnia-investigation-bybit-hack/
+tags:
+    - attack.persistence
+    - attack.t1136.003
+logsource:
+    category: application
+    service: aws_cloudtrail
+detection:
+    selection:
+        eventName:
+            - 'CreateUser'
+            - 'CreateRole'
+            - 'CreateAccessKey'
+    filter_cicd:
+        userIdentity.arn|contains: 'APPROVED_CICD_ROLE_LIST'  # populate with known automation role ARNs
+    condition: selection and not filter_cicd
+falsepositives:
+    - Legitimate manual IAM provisioning by an authorized cloud admin outside automated pipelines
+level: high
+
+---
+title: Virtual MFA Device Registration for Existing IAM User
+id: 8d1e2f3a-4b5c-4d7e-f6a7-9b0c1d2e3f04
+status: experimental
+description: Detects an attempt to enroll a new virtual MFA device on an existing IAM user, matching TraderTraitor's reported attempt to register an MFA device to solidify a foothold in the Bybit case.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.elastic.co/security-labs/bit-bybit
+tags:
+    - attack.persistence
+    - attack.t1556
+logsource:
+    category: application
+    service: aws_cloudtrail
+detection:
+    selection:
+        eventName:
+            - 'CreateVirtualMFADevice'
+            - 'EnableMFADevice'
+    condition: selection
+falsepositives:
+    - Legitimate self-service MFA enrollment by the account's actual owner
+level: medium
+
+---
+title: Extended Cloud Storage and IAM Enumeration Over Multi-Day Dwell
+id: 8d1e2f3a-4b5c-4d7e-f6a7-9b0c1d2e3f05
+status: experimental
+description: Detects sustained low-and-slow enumeration of S3 buckets, IAM roles, and CloudFront distributions from the same principal across multiple days, matching TraderTraitor's patient environment-mapping dwell time (approximately 12 days in the Bybit intrusion) before executing theft.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.sygnia.co/blog/sygnia-investigation-bybit-hack/
+tags:
+    - attack.discovery
+    - attack.t1526
+logsource:
+    category: application
+    service: aws_cloudtrail
+detection:
+    selection:
+        eventName:
+            - 'ListBuckets'
+            - 'ListRoles'
+            - 'ListDistributions'
+            - 'GetBucketPolicy'
+    timeframe: 7d
+    condition: selection | count() by userIdentity.arn > 20
+falsepositives:
+    - Legitimate security or cloud posture management tooling performing scheduled scans
+level: medium
+
+---
+title: CloudTrail Logging Disabled or Modified
+id: 8d1e2f3a-4b5c-4d7e-f6a7-9b0c1d2e3f06
+status: experimental
+description: Detects CloudTrail being stopped, deleted, or reconfigured to reduce coverage, matching TraderTraitor's reported evidence-minimization step of reducing the audit trail after malicious code is staged or removed.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://attack.mitre.org/techniques/T1562/008/
+tags:
+    - attack.defense_evasion
+    - attack.t1562.008
+logsource:
+    category: application
+    service: aws_cloudtrail
+detection:
+    selection:
+        eventName:
+            - 'StopLogging'
+            - 'DeleteTrail'
+            - 'UpdateTrail'
+    condition: selection
+falsepositives:
+    - Legitimate CloudTrail reconfiguration during a planned logging architecture change
+level: high
+
+---
+title: Unauthorized Modification of Hosted Frontend Bundle in S3
+id: 8d1e2f3a-4b5c-4d7e-f6a7-9b0c1d2e3f07
+status: experimental
+description: Detects a PutObject event modifying a production JavaScript bundle in an S3 bucket serving a live web frontend, outside of a recognized CI/CD deployment role, matching TraderTraitor's injection of malicious JavaScript to alter transaction payloads (as in the Bybit/Safe{Wallet} case).
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.elastic.co/security-labs/bit-bybit
+tags:
+    - attack.defense_evasion
+    - attack.t1578.002
+    - attack.impact
+logsource:
+    category: application
+    service: aws_cloudtrail
+detection:
+    selection:
+        eventName: 'PutObject'
+        requestParameters.key|endswith: '.js'
+        requestParameters.bucketName|contains: 'PRODUCTION_FRONTEND_BUCKET_LIST'  # populate with production hosting buckets
+    filter_cicd:
+        userIdentity.arn|contains: 'APPROVED_CICD_ROLE_LIST'  # populate with known automation role ARNs
+    condition: selection and not filter_cicd
+falsepositives:
+    - Legitimate manual hotfix deployment by an authorized engineer outside the normal pipeline
+level: critical
+
+---
+title: Large Cryptocurrency Withdrawal Followed by Rapid Mixer/Chain-Hop Activity
+id: 8d1e2f3a-4b5c-4d7e-f6a7-9b0c1d2e3f08
+status: experimental
+description: Detects a high-value cryptocurrency withdrawal followed within a short window by interaction with a known mixing service or rapid cross-chain movement, matching TraderTraitor's post-theft laundering pattern observed after the Bybit and related heists.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://lazarus.day/reports/tradertraitor-the-kings-of-the-crypto-heist-8F1n8/
+tags:
+    - attack.exfiltration
+    - attack.t1657
+logsource:
+    category: application
+    service: blockchain_monitoring
+detection:
+    selection_large_withdrawal:
+        EventType: 'Withdrawal'
+        AmountUsd|gt: 500000
+    selection_mixer:
+        DestinationAddress|contains: 'KNOWN_MIXER_BRIDGE_ADDRESS_LIST'  # populate from current chain-analysis feed
+    timeframe: 1h
+    condition: selection_large_withdrawal and selection_mixer
+falsepositives:
+    - Legitimate large institutional withdrawal that independently routes through a bridge for unrelated reasons
+level: critical
