@@ -1,1 +1,211 @@
+# =============================================================================
+# Sigma Detection Rules — Volt Typhoon
+# aka Vanguard Panda / BRONZE SILHOUETTE / Insidious Taurus / Voltzite / UNC3236
+# Author: Dalton Hunter
+# Source: dalthunter/intel-reports — Volt Typhoon
+# =============================================================================
 
+---
+title: LSASS Credential Dumping via comsvcs.dll MiniDump
+id: 9e2f3a4b-5c6d-4e8f-a7b8-0c1d2e3f4a01
+status: experimental
+description: Detects invocation of the legitimate comsvcs.dll MiniDump export against the LSASS process, a living-off-the-land credential dumping technique documented in Volt Typhoon intrusions that avoids deploying separate dumping malware.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-144a
+tags:
+    - attack.credential_access
+    - attack.t1003.001
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\rundll32.exe'
+        CommandLine|contains|all:
+            - 'comsvcs.dll'
+            - 'MiniDump'
+    condition: selection
+falsepositives:
+    - Legitimate diagnostic memory dump collected by IT/support staff using this documented technique
+level: critical
+
+---
+title: Exploitation Attempt Against End-of-Life Edge Device Management Interface
+id: 9e2f3a4b-5c6d-4e8f-a7b8-0c1d2e3f4a02
+status: experimental
+description: Detects inbound requests to the administrative interface of a known end-of-life edge device (Fortinet, Ivanti, NETGEAR, Citrix, Cisco) exhibiting exploitation patterns, matching Volt Typhoon's primary initial access vector.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.cisa.gov/news-events/cybersecurity-advisories/aa24-038a
+tags:
+    - attack.initial_access
+    - attack.t1190
+logsource:
+    category: firewall
+detection:
+    selection:
+        dst_port:
+            - 443
+            - 8443
+            - 10443
+        uri|contains:
+            - '/remote/'
+            - '/dana-na/'
+            - '/+CSCOE+/'
+    filter_patched_devices:
+        dst_ip|cidr: 'PATCHED_DEVICE_INVENTORY'  # populate with confirmed patched/retired device IP ranges
+    condition: selection and not filter_patched_devices
+falsepositives:
+    - Legitimate remote access to an unpatched-but-monitored device pending scheduled maintenance
+level: high
+
+---
+title: Authentication Originating from Residential or SOHO Proxy Infrastructure
+id: 9e2f3a4b-5c6d-4e8f-a7b8-0c1d2e3f4a03
+status: experimental
+description: Detects successful authentication to corporate remote access or VPN services from IP space associated with residential ISPs or known compromised SOHO router infrastructure, matching Volt Typhoon's KV Botnet proxying technique used to obscure true traffic origin.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://attack.mitre.org/campaigns/C0035/
+tags:
+    - attack.command_and_control
+    - attack.t1090.003
+logsource:
+    category: authentication
+detection:
+    selection:
+        EventType: 'LoginSuccess'
+        SourceIp|cidr: KV_BOTNET_PROXY_IOC_LIST  # populate via current threat intel feed
+    condition: selection
+falsepositives:
+    - Legitimate remote employee connecting from a home ISP that overlaps a stale IOC range
+level: high
+
+---
+title: Self-Signed Certificate Matching KV Botnet Naming Pattern
+id: 9e2f3a4b-5c6d-4e8f-a7b8-0c1d2e3f4a04
+status: experimental
+description: Detects TLS handshakes presenting a self-signed certificate with a common/subject name matching the "jdyfj"-style pattern reported in KV Botnet / JDY cluster infrastructure.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://attack.mitre.org/campaigns/C0035/
+tags:
+    - attack.command_and_control
+    - attack.t1573
+logsource:
+    category: proxy
+detection:
+    selection:
+        tls_cert_subject|re: 'jdyfj[a-z0-9]*'
+    condition: selection
+falsepositives:
+    - Coincidental certificate naming from an unrelated legitimate self-signed deployment
+level: high
+
+---
+title: Exploratory Hands-on-Keyboard PowerShell Command Sequences
+id: 9e2f3a4b-5c6d-4e8f-a7b8-0c1d2e3f4a05
+status: experimental
+description: Detects a pattern of repeated, incrementally-adjusted PowerShell commands from the same session inconsistent with a single scripted execution, matching Volt Typhoon's reported hands-on-keyboard, exploratory operating style.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-144a
+tags:
+    - attack.discovery
+    - attack.t1059.001
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\powershell.exe'
+    condition: selection | count() by User, ParentProcessId > 15
+falsepositives:
+    - Legitimate administrator performing an extended interactive troubleshooting session
+level: medium
+
+---
+title: Native LOLBin Discovery Commands Inconsistent with Admin Baseline
+id: 9e2f3a4b-5c6d-4e8f-a7b8-0c1d2e3f4a06
+status: experimental
+description: Detects use of native Windows discovery utilities (net, ipconfig, netstat, systeminfo, wmic) chained together in a sequence outside normal administrative baselines, matching Volt Typhoon's near-total reliance on living-off-the-land tooling for discovery and lateral movement.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-144a
+tags:
+    - attack.discovery
+    - attack.t1057
+    - attack.t1082
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith:
+            - '\net.exe'
+            - '\ipconfig.exe'
+            - '\netstat.exe'
+            - '\systeminfo.exe'
+            - '\wmic.exe'
+    timeframe: 10m
+    condition: selection | count() by User > 8
+falsepositives:
+    - Legitimate IT troubleshooting session running several discovery commands in sequence
+level: low
+
+---
+title: Authentication Targeting Personal Webmail from Corporate-Managed Device
+id: 9e2f3a4b-5c6d-4e8f-a7b8-0c1d2e3f4a07
+status: experimental
+description: Detects a managed IT/network administrator endpoint authenticating to a personal (non-corporate) webmail provider, consistent with Volt Typhoon's reported technique of targeting IT staff's personal email to evade corporate monitoring.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.cisa.gov/news-events/cybersecurity-advisories/aa24-038a
+tags:
+    - attack.discovery
+    - attack.t1589
+logsource:
+    category: proxy
+detection:
+    selection:
+        c-uri|contains:
+            - 'mail.google.com'
+            - 'outlook.live.com'
+            - 'mail.yahoo.com'
+    filter_it_hosts:
+        src_hostname|contains: 'IT_ADMIN_HOSTGROUP'  # populate with IT/network admin workstation inventory
+    condition: selection and filter_it_hosts
+falsepositives:
+    - IT staff member legitimately checking personal email on a managed device during a break
+level: low
+
+---
+title: Long-Retention Auth Log Gap Suggesting Silent Session Persistence
+id: 9e2f3a4b-5c6d-4e8f-a7b8-0c1d2e3f4a08
+status: experimental
+description: Detects a valid account maintaining an active authenticated session across an unusually long duration without corresponding periodic re-authentication events, consistent with Volt Typhoon's long-term, low-visibility pre-positioning objective rather than immediate collection.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.cisa.gov/news-events/cybersecurity-advisories/aa24-038a
+tags:
+    - attack.persistence
+    - attack.t1078
+logsource:
+    category: authentication
+detection:
+    selection:
+        SessionDurationHours|gt: 72
+        ReauthCount: 0
+    condition: selection
+falsepositives:
+    - Legitimate long-lived service account session under an accepted exception
+level: low
