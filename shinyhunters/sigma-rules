@@ -1,1 +1,228 @@
+# =============================================================================
+# Sigma Detection Rules — ShinyHunters
+# aka ShinyCorp / UNC6040 / UNC6041 / UNC6395 / UNC6661 / UNC6671
+# Author: Dalton Hunter
+# Source: dalthunter/intel-reports — ShinyHunters
+# =============================================================================
 
+---
+title: Lookalike Connected App Authorized via Vishing-Style Support Flow
+id: 7c9d1e2f-3a4b-4c6d-e5f6-8a9b0c1d2e01
+status: experimental
+description: Detects authorization of a new SaaS connected app whose name resembles a known IT/support tool, matching ShinyHunters' vishing-driven initial access pattern where a caller walks an employee through approving a lookalike app.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://attack.mitre.org/campaigns/C0059/
+    - https://www.huntress.com/threat-library/threat-actors/shinyhunters
+tags:
+    - attack.initial_access
+    - attack.t1566.004
+    - attack.t1528
+logsource:
+    category: application
+    service: saas_audit
+detection:
+    selection:
+        Action: 'ConnectedApp Authorization'
+        AppName|contains:
+            - 'Support'
+            - 'IT Helper'
+            - 'Verify'
+            - 'Sync Tool'
+    filter_known_good:
+        AppName|contains: 'APPROVED_APP_ALLOWLIST'  # populate with vetted app names
+    condition: selection and not filter_known_good
+falsepositives:
+    - Legitimately named internal or vendor-approved integration matching a generic keyword
+level: medium
+
+---
+title: Credential Reuse Login from Infostealer-Associated IP or ASN
+id: 7c9d1e2f-3a4b-4c6d-e5f6-8a9b0c1d2e02
+status: experimental
+description: Detects a successful login using credentials recently observed in infostealer log dumps or from infrastructure associated with credential marketplaces, matching ShinyHunters' reuse of stolen or purchased credentials.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.huntress.com/threat-library/threat-actors/shinyhunters
+tags:
+    - attack.initial_access
+    - attack.t1078
+logsource:
+    category: authentication
+detection:
+    selection:
+        EventType: 'LoginSuccess'
+        SourceIp|cidr: KNOWN_INFOSTEALER_IOC_LIST  # populate via current threat intel feed
+    condition: selection
+falsepositives:
+    - Shared/dynamic IP address reused by an unrelated legitimate user after the flagged session
+level: medium
+
+---
+title: OAuth Refresh Token Used from New Third-Party Integration Without Login Event
+id: 7c9d1e2f-3a4b-4c6d-e5f6-8a9b0c1d2e03
+status: experimental
+description: Detects API activity authenticated via a stored OAuth refresh token from a third-party SaaS integration (e.g. Drift, Gainsight) accessing Salesforce data without a corresponding interactive login, matching ShinyHunters' token abuse to reach connected environments quietly.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://attack.mitre.org/techniques/T1528/
+tags:
+    - attack.persistence
+    - attack.t1528
+logsource:
+    category: application
+    product: salesforce
+    service: login_history
+detection:
+    selection:
+        LoginType: 'OAuth-Refresh-Token'
+        AppName|contains:
+            - 'Drift'
+            - 'Gainsight'
+    filter_known_good:
+        AppName|contains: 'APPROVED_INTEGRATION_LIST'  # populate with sanctioned third-party integrations
+    condition: selection and not filter_known_good
+falsepositives:
+    - Legitimate ongoing use of a sanctioned third-party CRM integration
+level: medium
+
+---
+title: Session Cookie Reuse After Credential Rotation
+id: 7c9d1e2f-3a4b-4c6d-e5f6-8a9b0c1d2e04
+status: experimental
+description: Detects continued authenticated activity under a session token that predates a recent password reset for the same account, consistent with ShinyHunters' use of stolen session cookies to persist through credential rotation.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://attack.mitre.org/techniques/T1556/003/
+tags:
+    - attack.defense_evasion
+    - attack.t1556.003
+logsource:
+    category: application
+    service: identity_provider
+detection:
+    selection_reset:
+        OperationName: 'Reset password (self-service or admin)'
+    selection_old_session:
+        SessionCreatedTime|lt: 'field:PasswordResetTime'
+        EventType: 'AuthenticatedRequest'
+    timeframe: 24h
+    condition: selection_reset and selection_old_session
+falsepositives:
+    - Session revocation delay in identity provider allowing a brief valid overlap window
+level: high
+
+---
+title: Gmail Add-On Authorized with Mail Deletion Scope
+id: 7c9d1e2f-3a4b-4c6d-e5f6-8a9b0c1d2e05
+status: experimental
+description: Detects authorization of a Google Workspace add-on requesting mail deletion or modify scopes, matching ShinyHunters' reported technique of silently deleting MFA enrollment notification emails to delay detection.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.huntress.com/threat-library/threat-actors/shinyhunters
+tags:
+    - attack.defense_evasion
+    - attack.t1564
+logsource:
+    category: application
+    service: gsuite_activity
+detection:
+    selection:
+        EventType: 'AUTHORIZE'
+        ScopeData|contains:
+            - 'gmail.modify'
+            - 'gmail.settings.basic'
+    filter_known_good:
+        AppName|contains: 'APPROVED_GSUITE_ADDON_LIST'  # populate with vetted add-ons
+    condition: selection and not filter_known_good
+falsepositives:
+    - Legitimate email-management add-on (unsubscribe tools, cleanup utilities) approved by the user
+level: high
+
+---
+title: Bulk Export or API Pull from Snowflake/BigQuery Outside Business Hours
+id: 7c9d1e2f-3a4b-4c6d-e5f6-8a9b0c1d2e06
+status: experimental
+description: Detects a large-volume query or export job against a Snowflake warehouse or BigQuery dataset executed outside normal business hours, matching ShinyHunters' collection stage which precedes extortion in several disclosed cases.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://attack.mitre.org/techniques/T1530/
+tags:
+    - attack.collection
+    - attack.t1530
+    - attack.exfiltration
+logsource:
+    category: application
+    service: data_warehouse_audit
+detection:
+    selection:
+        QueryType:
+            - 'COPY INTO'
+            - 'EXPORT DATA'
+            - 'SELECT'
+        RowsReturned|gt: 100000
+    timeframe_filter:
+        QueryHourUTC|gte: 22
+    condition: selection and timeframe_filter
+falsepositives:
+    - Legitimate scheduled ETL or reporting job running during off-hours
+level: medium
+
+---
+title: Bulk Native Export Activity from Compromised SaaS Admin Session
+id: 7c9d1e2f-3a4b-4c6d-e5f6-8a9b0c1d2e07
+status: experimental
+description: Detects repeated use of a platform's own export/report functionality generating an unusually high volume of records within a short window, matching ShinyHunters' preference for exfiltrating via legitimate native tooling to blend with admin activity.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://www.huntress.com/threat-library/threat-actors/shinyhunters
+tags:
+    - attack.exfiltration
+    - attack.t1567.002
+    - attack.collection
+logsource:
+    category: application
+    service: saas_audit
+detection:
+    selection:
+        Action:
+            - 'ReportExport'
+            - 'BulkDataExport'
+    condition: selection | count(RequestId) by UserId > 20
+falsepositives:
+    - Legitimate bulk reporting or scheduled data sync by an authorized admin
+level: medium
+
+---
+title: Extortion Contact Referencing Leaked Data via Known Actor Infrastructure
+id: 7c9d1e2f-3a4b-4c6d-e5f6-8a9b0c1d2e08
+status: experimental
+description: Detects inbound email or web-form contact referencing stolen data and directing the recipient to a Tox ID or ShinyHunters-branded leak site, confirming the extortion stage has begun.
+author: Dalton Hunter
+date: 2026/08/23
+references:
+    - https://securityboulevard.com/2026/05/shinyhunters-the-group-behind-300-breaches/
+tags:
+    - attack.impact
+    - attack.t1657
+logsource:
+    category: email
+    service: gateway
+detection:
+    selection:
+        Body|contains:
+            - 'Tox ID'
+            - 'leak site'
+            - 'ShinyHunters'
+            - 'ShinySp1d3r'
+    condition: selection
+falsepositives:
+    - Legitimate security researcher or journalist correspondence referencing the group by name
+level: high
