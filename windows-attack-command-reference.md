@@ -1,6 +1,6 @@
 # Windows Attack Command & Detection Reference
 
-A complete, kill-chain-ordered reference of attacker commands mapped to MITRE ATT&CK, with Windows/Sysmon telemetry and detection guidance. Built for CTI/SOC study and portfolio use. Every ATT&CK ID below was verified against the live MITRE ATT&CK site — none pulled from memory alone.
+A complete, kill-chain-ordered reference of attacker commands mapped to MITRE ATT&CK, with Windows/Sysmon telemetry and detection guidance. Built for CTI/SOC study and portfolio use. Every ATT&CK ID below was verified against the live MITRE ATT&CK site.
 
 **~105 commands across 10 categories, ordered the way a real intrusion unfolds.**
 
