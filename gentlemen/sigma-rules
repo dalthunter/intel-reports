@@ -1,128 +1,210 @@
 # =============================================================================
-# Sigma Detection Rules — The Gentlemen
+# Sigma Detection Rules: The Gentlemen
 # aka Storm-2697 (Microsoft)
 # Author: Dalton Hunter
-# Source: dalthunter/intel-reports — The Gentlemen
+# Source: dalthunter/intel-reports, The Gentlemen
+#
+# Validated with sigma-cli 4.0.0 (`sigma check`). Status is "experimental"
+# until each rule has been tested against simulated activity in a lab.
 # =============================================================================
 
 ---
-title: FortiGate Authentication Bypass Exploitation Attempt (CVE-2024-55591)
-id: 3e5f6a7b-8c9d-4e2f-a1b2-4c5d6e7f8a01
+title: FortiGate Admin Activity via jsconsole (CVE-2024-55591)
+id: 443cd001-5181-4eaf-8f29-bb30a118534b
 status: experimental
-description: Detects HTTP/HTTPS requests targeting the FortiOS/FortiProxy websocket authentication-bypass flaw used by The Gentlemen as their primary initial access vector.
-author: Dalton Hunter
-date: 2026/08/23
+description: >
+    Detects FortiOS administrator logins and new admin account creation performed
+    through the jsconsole management interface, the pattern Fortinet published as an
+    indicator of CVE-2024-55591 exploitation. The Gentlemen use this flaw as their
+    primary initial access vector.
 references:
+    - https://fortiguard.fortinet.com/psirt/FG-IR-24-535
     - https://nvd.nist.gov/vuln/detail/CVE-2024-55591
     - https://fortiguard.fortinet.com/threat-actor/6387/the-gentlemen-ransomware
+author: Dalton Hunter
+date: 2026-08-23
+modified: 2026-11-03
 tags:
-    - attack.initial_access
+    - attack.initial-access
     - attack.t1190
+    - attack.persistence
+    - attack.t1136.001
+    - cve.2024-55591
 logsource:
-    category: firewall
-    product: fortinet
+    product: fortios
+    service: event
 detection:
-    selection:
-        uri|contains:
-            - '/jsconsole'
-            - 'ws://'
-        c-uri|contains: '/api/v2/'
-    condition: selection
+    selection_ui:
+        ui|contains: 'jsconsole'
+    selection_login:
+        logdesc: 'Admin login successful'
+    selection_admin_add:
+        logdesc: 'Object attribute configured'
+        cfgpath: 'system.admin'
+        action: 'Add'
+    condition: selection_ui and (selection_login or selection_admin_add)
 falsepositives:
-    - Legitimate FortiGate admin console usage over the same path in edge cases
+    - Administrators who legitimately use the jsconsole CLI widget in the GUI; baseline expected admin accounts and source IPs
 level: high
 
 ---
-title: Erlang/OTP SSH Remote Code Execution Attempt (CVE-2025-32433)
-id: 3e5f6a7b-8c9d-4e2f-a1b2-4c5d6e7f8a02
+title: Shell Spawned by Erlang/OTP Runtime (CVE-2025-32433)
+id: 2267a422-1a33-4e3a-84bf-b2ead9d859b5
 status: experimental
-description: Detects anomalous SSH protocol messages sent prior to authentication, consistent with exploitation of the Erlang/OTP SSH RCE flaw used against exposed management infrastructure.
-author: Dalton Hunter
-date: 2026/08/23
+description: >
+    Detects a Unix shell launched by the Erlang/OTP runtime, the host-side result of
+    successful remote code execution through the pre-authentication Erlang/OTP SSH
+    flaw used against exposed management infrastructure.
 references:
     - https://nvd.nist.gov/vuln/detail/CVE-2025-32433
-tags:
-    - attack.initial_access
-    - attack.t1190
-logsource:
-    category: application
-    service: ssh
-detection:
-    selection:
-        EventType: 'PreAuthChannelRequest'
-    condition: selection
-falsepositives:
-    - Non-standard SSH clients performing protocol negotiation quirks
-level: high
-
----
-title: NTLM Reflection Privilege Escalation Attempt (CVE-2025-33073)
-id: 3e5f6a7b-8c9d-4e2f-a1b2-4c5d6e7f8a03
-status: experimental
-description: Detects an NTLM authentication reflected back to the originating host to obtain SYSTEM privileges, consistent with post-compromise privilege escalation reported for The Gentlemen.
 author: Dalton Hunter
-date: 2026/08/23
-references:
-    - https://nvd.nist.gov/vuln/detail/CVE-2025-33073
+date: 2026-08-23
+modified: 2026-11-03
 tags:
-    - attack.privilege_escalation
-    - attack.t1068
+    - attack.initial-access
+    - attack.t1190
+    - attack.execution
+    - attack.t1059.004
+    - cve.2025-32433
 logsource:
     category: process_creation
-    product: windows
+    product: linux
 detection:
-    selection:
-        Image|endswith: '\rundll32.exe'
-        CommandLine|contains:
-            - 'DavSetCookie'
-            - 'WebClient'
-    condition: selection
+    selection_parent:
+        ParentImage|endswith:
+            - '/beam.smp'
+            - '/erl_child_setup'
+    selection_shell:
+        Image|endswith:
+            - '/sh'
+            - '/bash'
+            - '/dash'
+            - '/zsh'
+    condition: selection_parent and selection_shell
 falsepositives:
-    - Legitimate WebDAV client activity in rare enterprise configurations
+    - Erlang applications such as RabbitMQ or CouchDB that legitimately run shell commands; baseline per host
 level: medium
 
 ---
-title: Mass Security Log and Forensic Artifact Clearing
-id: 3e5f6a7b-8c9d-4e2f-a1b2-4c5d6e7f8a04
+title: AD DNS Record With Marshaled Target Info (CVE-2025-33073)
+id: 550d5e03-b7a9-42ee-82cb-cbc411b7f8e4
 status: experimental
-description: Detects clearing of Windows event logs, prefetch, or PowerShell history in immediate succession, matching The Gentlemen's pre-encryption anti-forensic cleanup.
+description: >
+    Detects creation or modification of an Active Directory-integrated DNS record whose
+    name contains the marshaled CREDENTIAL_TARGET_INFORMATION string used to set up
+    NTLM/Kerberos reflection, the preparation step for CVE-2025-33073 privilege
+    escalation. Requires directory service auditing on the DNS zone containers.
+references:
+    - https://nvd.nist.gov/vuln/detail/CVE-2025-33073
 author: Dalton Hunter
-date: 2026/08/23
+date: 2026-08-23
+modified: 2026-11-03
+tags:
+    - attack.privilege-escalation
+    - attack.t1068
+    - attack.credential-access
+    - attack.t1557.001
+    - cve.2025-33073
+logsource:
+    product: windows
+    service: security
+    definition: 'Requirements: Audit Directory Service Changes enabled, with a SACL on the AD-integrated DNS zone containers'
+detection:
+    selection:
+        EventID:
+            - 5136
+            - 5137
+        ObjectClass: 'dnsNode'
+        ObjectDN|contains: '1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAwbEAYBAAAA'
+    condition: selection
+falsepositives:
+    - Unlikely; this marshaled string has no legitimate use in DNS record names
+level: high
+
+---
+title: Windows Event Log, Prefetch, or PowerShell History Clearing
+id: 5fe03799-502a-44ca-bed3-1301dbd6e999
+status: experimental
+description: >
+    Detects command-line clearing of Windows event logs, prefetch files, or PowerShell
+    command history, matching The Gentlemen's pre-encryption anti-forensic cleanup.
 references:
     - https://www.huntress.com/blog/the-gentlemen-ransomware-defense-evasion-ttps
+author: Dalton Hunter
+date: 2026-08-23
+modified: 2026-11-03
 tags:
-    - attack.defense_evasion
+    - attack.defense-evasion
     - attack.t1070.001
-    - attack.t1070.004
     - attack.t1070.003
+    - attack.t1070.004
 logsource:
     category: process_creation
     product: windows
 detection:
-    selection_wevtutil:
+    selection_wevtutil_img:
         Image|endswith: '\wevtutil.exe'
-        CommandLine|contains: 'cl '
-    selection_prefetch:
+    selection_wevtutil_cmd:
+        CommandLine|contains:
+            - ' cl '
+            - ' clear-log '
+    selection_ps_clear:
+        CommandLine|contains:
+            - 'Clear-EventLog'
+            - 'Remove-EventLog'
+    selection_prefetch_path:
         CommandLine|contains: '\Windows\Prefetch'
+    selection_prefetch_cmd:
         CommandLine|contains:
             - 'del '
             - 'Remove-Item'
+            - 'erase '
     selection_psreadline:
         CommandLine|contains: 'ConsoleHost_history.txt'
-    condition: selection_wevtutil or selection_prefetch or selection_psreadline
+    condition: (selection_wevtutil_img and selection_wevtutil_cmd) or selection_ps_clear or (selection_prefetch_path and selection_prefetch_cmd) or selection_psreadline
 falsepositives:
-    - Scripted log rotation or IT maintenance jobs
+    - Scripted log rotation or IT maintenance jobs; tune by parent process or user
 level: high
 
 ---
-title: Shadow Copy Deletion Preceding Ransomware Detonation
-id: 3e5f6a7b-8c9d-4e2f-a1b2-4c5d6e7f8a05
+title: Security Event Log Cleared
+id: 6b2b9313-cfa9-4158-b36a-9d10f02154ae
 status: experimental
-description: Detects deletion of volume shadow copies via vssadmin, wmic, or PowerShell, a near-certain precursor to The Gentlemen's encryption stage.
+description: >
+    Detects clearing of the Windows Security event log through any method. Companion
+    to the command-line rule above; catches clearing done through the GUI, APIs, or
+    renamed tools.
+references:
+    - https://www.huntress.com/blog/the-gentlemen-ransomware-defense-evasion-ttps
 author: Dalton Hunter
-date: 2026/08/23
+date: 2026-11-03
+tags:
+    - attack.defense-evasion
+    - attack.t1070.001
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 1102
+    condition: selection
+falsepositives:
+    - Rare, documented log maintenance by administrators
+level: high
+
+---
+title: Shadow Copy or Backup Catalog Deletion
+id: 531cfe36-bc78-4428-9254-40e0d136a3f8
+status: experimental
+description: >
+    Detects deletion of volume shadow copies or the Windows backup catalog through
+    vssadmin, wmic, wbadmin, or PowerShell, a near-certain precursor to The Gentlemen's
+    encryption stage.
 references:
     - https://www.microsoft.com/en-us/security/blog/2026/05/28/the-gentlemen-ransomware-dissecting-a-self-propagating-go-encryptor/
+author: Dalton Hunter
+date: 2026-08-23
+modified: 2026-11-03
 tags:
     - attack.impact
     - attack.t1490
@@ -132,106 +214,214 @@ logsource:
 detection:
     selection_vssadmin:
         Image|endswith: '\vssadmin.exe'
-        CommandLine|contains: 'delete shadows'
+        CommandLine|contains:
+            - 'delete shadows'
+            - 'resize shadowstorage'
     selection_wmic:
         Image|endswith: '\wmic.exe'
         CommandLine|contains: 'shadowcopy delete'
-    selection_powershell:
-        Image|endswith: '\powershell.exe'
-        CommandLine|contains: 'Get-WmiObject Win32_Shadowcopy'
-    condition: selection_vssadmin or selection_wmic or selection_powershell
+    selection_wbadmin:
+        Image|endswith: '\wbadmin.exe'
+        CommandLine|contains: 'delete catalog'
+    selection_ps_img:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+    selection_ps_shadow:
+        CommandLine|contains: 'Win32_Shadowcopy'
+    selection_ps_delete:
+        CommandLine|contains:
+            - '.Delete()'
+            - 'Remove-WmiObject'
+            - 'Remove-CimInstance'
+    condition: selection_vssadmin or selection_wmic or selection_wbadmin or (selection_ps_img and selection_ps_shadow and selection_ps_delete)
 falsepositives:
-    - Legitimate backup software managing shadow copy retention
+    - Backup software managing shadow copy retention; tune by parent process
 level: high
 
 ---
-title: Unauthorized Cloudflare Zero Trust Tunnel Registration
-id: 3e5f6a7b-8c9d-4e2f-a1b2-4c5d6e7f8a06
+title: Cloudflare Tunnel Client Execution
+id: 4fafadcb-7884-4835-b51c-b273bdfa49af
 status: experimental
-description: Detects installation or execution of the Cloudflare tunnel client (cloudflared) outside approved change windows, matching The Gentlemen's use of covert tunnels for staged exfiltration.
-author: Dalton Hunter
-date: 2026/08/23
+description: >
+    Detects the Cloudflare tunnel client (cloudflared) starting a tunnel, matched on
+    command-line arguments so renamed copies are still caught. The Gentlemen register
+    unauthorized tunnels inside victim environments for covert access and staged
+    exfiltration.
 references:
     - https://www.microsoft.com/en-us/security/blog/2026/05/28/the-gentlemen-ransomware-dissecting-a-self-propagating-go-encryptor/
+author: Dalton Hunter
+date: 2026-08-23
+modified: 2026-11-03
 tags:
+    - attack.command-and-control
+    - attack.t1572
     - attack.exfiltration
-    - attack.t1020
-    - attack.command_and_control
-    - attack.t1090
+    - attack.t1048
 logsource:
     category: process_creation
+    product: windows
+detection:
+    selection_tunnel:
+        CommandLine|contains: ' tunnel '
+    selection_args:
+        CommandLine|contains:
+            - ' run'
+            - '--token'
+            - 'service install'
+    condition: selection_tunnel and selection_args
+falsepositives:
+    - Sanctioned Cloudflare Zero Trust deployments; exclude approved hosts or service accounts
+level: high
+
+---
+title: DNS Query to Cloudflare Tunnel Infrastructure
+id: 1b93836e-ae33-44c1-9875-af6ecdf16442
+status: experimental
+description: >
+    Detects DNS lookups for Cloudflare tunnel infrastructure, which any cloudflared
+    client must contact regardless of how the binary is named or launched.
+references:
+    - https://www.microsoft.com/en-us/security/blog/2026/05/28/the-gentlemen-ransomware-dissecting-a-self-propagating-go-encryptor/
+author: Dalton Hunter
+date: 2026-11-03
+tags:
+    - attack.command-and-control
+    - attack.t1572
+logsource:
+    category: dns_query
     product: windows
 detection:
     selection:
-        Image|endswith: '\cloudflared.exe'
-        CommandLine|contains: 'tunnel'
-    filter_approved:
-        User|contains: 'APPROVED_ADMIN_ACCOUNTS'  # populate with authorized change-control accounts
-    condition: selection and not filter_approved
+        QueryName|endswith: 'argotunnel.com'
+    condition: selection
 falsepositives:
-    - Sanctioned Cloudflare Zero Trust deployment by IT/network team
-level: high
+    - Sanctioned Cloudflare Zero Trust deployments; exclude approved hosts
+level: medium
 
 ---
-title: GPO Modification Followed by Domain-Wide Binary Push
-id: 3e5f6a7b-8c9d-4e2f-a1b2-4c5d6e7f8a07
+title: Group Policy Container Modified
+id: b00d887e-2a9a-4da5-b84a-d169f044fea6
+name: gentlemen_gpo_container_modified
 status: experimental
-description: Detects a Group Policy Object modification closely followed by new executable creation across multiple domain-joined hosts, consistent with The Gentlemen's domain-wide GPO-based encryptor propagation.
-author: Dalton Hunter
-date: 2026/08/23
+description: >
+    Detects modification of a Group Policy Object in Active Directory. Base rule for the
+    GPO-push correlation below; on its own it is noisy in environments with frequent
+    policy changes.
 references:
     - https://www.microsoft.com/en-us/security/blog/2026/05/28/the-gentlemen-ransomware-dissecting-a-self-propagating-go-encryptor/
+author: Dalton Hunter
+date: 2026-11-03
 tags:
-    - attack.lateral_movement
+    - attack.defense-evasion
+    - attack.privilege-escalation
     - attack.t1484.001
-    - attack.impact
-    - attack.t1486
 logsource:
-    category: process_creation
     product: windows
+    service: security
+    definition: 'Requirements: Audit Directory Service Changes enabled on domain controllers'
 detection:
-    selection_gpo:
-        Image|endswith:
-            - '\gpscript.exe'
-            - '\gpupdate.exe'
-    selection_ad_change:
+    selection:
         EventID: 5136
         ObjectClass: 'groupPolicyContainer'
-    timeframe: 1h
-    condition: selection_gpo and selection_ad_change
+    condition: selection
 falsepositives:
-    - Legitimate scheduled GPO software deployment
-level: high
+    - Legitimate Group Policy administration
+level: low
 
 ---
-title: Native CLI Active Directory Enumeration Ahead of Deployment
-id: 3e5f6a7b-8c9d-4e2f-a1b2-4c5d6e7f8a08
+title: Scheduled Task XML Written to SYSVOL
+id: cb93827c-9577-4870-9503-725eb08a0db3
+name: gentlemen_sysvol_scheduledtask_write
 status: experimental
-description: Detects use of built-in Windows tools (net, nltest, dsquery, PowerShell AD module) to enumerate privileged accounts and domain structure, matching The Gentlemen's living-off-the-land reconnaissance ahead of ransomware deployment.
+description: >
+    Detects write access to a ScheduledTasks.xml file in SYSVOL, the Group Policy
+    Preferences mechanism ransomware operators use to run an encryptor on every
+    domain-joined host. Base rule for the GPO-push correlation below.
+references:
+    - https://www.microsoft.com/en-us/security/blog/2026/05/28/the-gentlemen-ransomware-dissecting-a-self-propagating-go-encryptor/
 author: Dalton Hunter
-date: 2026/08/23
+date: 2026-11-03
+tags:
+    - attack.defense-evasion
+    - attack.privilege-escalation
+    - attack.t1484.001
+    - attack.execution
+    - attack.t1053.005
+logsource:
+    product: windows
+    service: security
+    definition: 'Requirements: Audit Detailed File Share enabled on domain controllers'
+detection:
+    selection:
+        EventID: 5145
+        ShareName|endswith: 'SYSVOL'
+        RelativeTargetName|endswith: 'ScheduledTasks.xml'
+        AccessList|contains: '%%4417'
+    condition: selection
+falsepositives:
+    - Administrators creating scheduled tasks through Group Policy Preferences
+level: medium
+
+---
+title: GPO Modified Then Scheduled Task Pushed via SYSVOL
+id: b9273655-7d91-47de-810d-6c0734ed9167
+status: experimental
+description: >
+    Correlates a Group Policy Object modification with a ScheduledTasks.xml write to
+    SYSVOL by the same account within one hour, consistent with The Gentlemen pushing
+    their encryptor domain-wide through a modified GPO.
+references:
+    - https://www.microsoft.com/en-us/security/blog/2026/05/28/the-gentlemen-ransomware-dissecting-a-self-propagating-go-encryptor/
+author: Dalton Hunter
+date: 2026-11-03
+correlation:
+    type: temporal
+    rules:
+        - gentlemen_gpo_container_modified
+        - gentlemen_sysvol_scheduledtask_write
+    group-by:
+        - SubjectUserName
+    timespan: 1h
+falsepositives:
+    - Planned software deployment through Group Policy; correlate with change tickets
+level: critical
+
+---
+title: Privileged Group and Domain Trust Enumeration via Native Tools
+id: 07f8c3c6-db0c-46c5-b43f-5b97e15305e7
+status: experimental
+description: >
+    Detects built-in Windows tools (net, nltest, dsquery) enumerating privileged groups,
+    domain controllers, or domain trusts, matching The Gentlemen's living-off-the-land
+    reconnaissance ahead of ransomware deployment.
 references:
     - https://redpiranha.net/news/the-gentlemen-ransomware-analysis
+author: Dalton Hunter
+date: 2026-08-23
+modified: 2026-11-03
 tags:
     - attack.discovery
-    - attack.t1087.002
+    - attack.t1069.002
+    - attack.t1482
     - attack.t1018
 logsource:
     category: process_creation
     product: windows
 detection:
-    selection:
+    selection_img:
         Image|endswith:
             - '\net.exe'
             - '\net1.exe'
             - '\nltest.exe'
             - '\dsquery.exe'
-    CommandLine|contains:
-        - 'group'
-        - 'domain_admins'
-        - '/domain_trusts'
-        - 'Get-ADUser'
-    condition: selection
+    selection_cmd:
+        CommandLine|contains:
+            - 'domain admins'
+            - 'enterprise admins'
+            - '/domain_trusts'
+            - '/dclist'
+    condition: selection_img and selection_cmd
 falsepositives:
-    - Routine administrative enumeration by IT/helpdesk staff
+    - Routine administrative enumeration by IT or help desk staff
 level: low
