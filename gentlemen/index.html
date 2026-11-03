@@ -160,7 +160,7 @@
             <div class="phase-head"><span class="phase-num">01</span><h3>Initial Access</h3></div>
             <div class="ttp-card">
               <div class="ttp-top"><span class="ttp-name"><a class="mitre-link" href="https://attack.mitre.org/techniques/T1190/" target="_blank" rel="noopener">Exploit Public-Facing Application</a></span></div>
-              <p><strong>FortiGate / Cisco appliances:</strong> Most often <span class="mono"><a class="cve-link" href="https://nvd.nist.gov/vuln/detail/CVE-2024-55591" target="_blank" rel="noopener">CVE-2024-55591</a></span> (FortiOS/FortiProxy auth-bypass), alongside <span class="mono"><a class="cve-link" href="https://nvd.nist.gov/vuln/detail/CVE-2025-32433" target="_blank" rel="noopener">CVE-2025-32433</a></span> and <span class="mono"><a class="cve-link" href="https://nvd.nist.gov/vuln/detail/CVE-2025-33073" target="_blank" rel="noopener">CVE-2025-33073</a></span>.</p>
+              <p><strong>FortiGate / Cisco appliances:</strong> Most often <span class="mono"><a class="cve-link" href="https://nvd.nist.gov/vuln/detail/CVE-2024-55591" target="_blank" rel="noopener">CVE-2024-55591</a></span> (FortiOS/FortiProxy auth-bypass),  alongside <span class="mono"><a class="cve-link" href="https://nvd.nist.gov/vuln/detail/CVE-2025-32433" target="_blank" rel="noopener">CVE-2025-32433</a></span> (Erlang/OTP SSH remote code execution) against exposed management infrastructure.</p>
             </div>
             <div class="ttp-card">
               <div class="ttp-top"><span class="ttp-name"><a class="mitre-link" href="https://attack.mitre.org/techniques/T1078/" target="_blank" rel="noopener">Valid Accounts</a></span></div>
@@ -196,7 +196,7 @@
             </div>
             <div class="ttp-card">
               <div class="ttp-top"><span class="ttp-name"><a class="mitre-link" href="https://attack.mitre.org/techniques/T1068/" target="_blank" rel="noopener">Exploitation for Privilege Escalation</a></span></div>
-              <p><strong>UAC bypass &amp; driver abuse:</strong> Elevates a foothold to domain-level access before the encryptor is staged.</p>
+              <p><strong>UAC bypass, driver abuse &amp; NTLM reflection:</strong> Elevates a foothold to domain-level access before the encryptor is staged, including abuse of <span class="mono"><a class="cve-link" href="https://nvd.nist.gov/vuln/detail/CVE-2025-33073" target="_blank" rel="noopener">CVE-2025-33073</a></span> (Windows SMB/NTLM reflection).</p>
             </div>
             <div class="callout analyst-note phase-note">
               <div class="callout-label">Analyst Note</div>
@@ -261,7 +261,8 @@
           <h2>Detection &amp; Mitigation Priorities</h2>
           <p>Ordered by impact-to-effort ratio for a mid-sized enterprise.</p>
           <ul class="mit-list">
-            <li><span class="pri">P1</span><span><strong>Patch internet-facing FortiGate and Cisco appliances immediately</strong>, prioritizing <a class="cve-link" href="https://nvd.nist.gov/vuln/detail/CVE-2024-55591" target="_blank" rel="noopener">CVE-2024-55591</a>, <a class="cve-link" href="https://nvd.nist.gov/vuln/detail/CVE-2025-32433" target="_blank" rel="noopener">CVE-2025-32433</a>, and <a class="cve-link" href="https://nvd.nist.gov/vuln/detail/CVE-2025-33073" target="_blank" rel="noopener">CVE-2025-33073</a>.</span></li>
+            <li><span class="pri">P1</span><span><strong>Patch internet-facing FortiGate and Cisco appliances immediately</strong>, prioritizing <a class="cve-link" href="https://nvd.nist.gov/vuln/detail/CVE-2024-55591" target="_blank" rel="noopener">CVE-2024-55591</a> and <a class="cve-link" href="https://nvd.nist.gov/vuln/detail/CVE-2025-32433" target="_blank" rel="noopener">CVE-2025-32433</a>.</span></li>
+            <li><span class="pri">P1</span><span><strong>Apply Microsoft's June 2025 security updates for <a class="cve-link" href="https://nvd.nist.gov/vuln/detail/CVE-2025-33073" target="_blank" rel="noopener">CVE-2025-33073</a> and enforce SMB signing</strong> across the domain.</span></li>
             <li><span class="pri">P1</span><span><strong>Disable NTLMv1 and enforce MFA</strong> on every VPN and remote-access endpoint.</span></li>
             <li><span class="pri">P1</span><span><strong>Alert on shadow-copy deletion, Defender tampering, and log/prefetch clearing</strong> as near-certain precursors to encryption.</span></li>
             <li><span class="pri">P2</span><span><strong>Audit and remove unauthorized Cloudflare Zero Trust tunnels</strong> and unexpected remote-access tooling.</span></li>
